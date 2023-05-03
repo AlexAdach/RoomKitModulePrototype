@@ -25,6 +25,7 @@ namespace RoomKitModulePrototype
 
         public string[] Path { get { return _path; } }
         public string StatusArg { get { return _statusArg; } }
+        public bool Feedback { get { return _feedback; } }
 
         public StringCollection PropertyArgs { get { return _propertyArgs; } }
 

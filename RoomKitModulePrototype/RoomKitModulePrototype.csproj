@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Remove="CiscoProperty\PropertyBuilder.cs" />
+    <Compile Remove="Modules\ButtonModule.cs" />
+    <Compile Remove="Modules\CoreModule.cs" />
   </ItemGroup>
 
   <ItemGroup>

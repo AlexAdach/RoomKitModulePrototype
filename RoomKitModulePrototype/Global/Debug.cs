@@ -24,7 +24,8 @@ namespace RoomKitModulePrototype
         None,
         Error,
         Debug,
-        
+        DebugCode,
+        DebugComms,
 
 
 

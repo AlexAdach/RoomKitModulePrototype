@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RoomKitModulePrototype.Common.DTO
+namespace RoomKitModulePrototype
 {
-    class CodecCommStatusDTO
+    public class CodecCommStatusDTO : BaseDTO
     {
+        public bool CodecConnected { get; set; }
+        public bool CodecLoggedIn { get; set; }
     }
 }

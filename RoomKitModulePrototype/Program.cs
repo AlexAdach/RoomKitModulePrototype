@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace RoomKitModulePrototype
 {
@@ -8,70 +9,50 @@ namespace RoomKitModulePrototype
         {
             Program program = new Program();
 
-            CoreModule coreModule = new CoreModule();
-            ButtonModule buttonModule = new ButtonModule();
+            Thread CallModule1 = new Thread(Module1);
+            CallModule1.Start();
 
+            Thread CallModule2 = new Thread(Module2);
+            CallModule2.Start();
 
-            coreModule.AddProperty(new string[] { "Audio", "Microphones" }, "Mute", new string[] { "Mute", "UnMute" }, true);
-            coreModule.AddProperty(new string[] { "Standby" }, "State", new string[] { "Activate", "Deactivate", "Halfwake" }, true);
+            PropertyModule propertyModule2 = new PropertyModule();
+            propertyModule2.Initialize("Module1");
 
-
+            propertyModule2.AddProperty(new string[] { "Audio", "Microphones" }, "Mute", new string[] { "Mute", "UnMute" }, true);
 
             while (true)
             {
                 Console.ReadLine();
-                for (var i = 0; i < coreModule.ModuleProperties.Count; i++)
-                {
-                    var prop = coreModule.ModuleProperties[i];
-
-                    string line = i + " - " + String.Join(" ",prop.Path) + " " + prop.StatusArg;
-                    Debug.Log(line);
-                }
-
-                //Select a property to affect
-                var propSelect = Console.ReadLine();
-                var ipropSelect = Int32.Parse(propSelect);
-
-                Console.WriteLine("0 - GetStatus");
-                Console.WriteLine("1 - SetStatus");
-                Console.WriteLine("2 - SetFeedback");
-
-                //Select a command to send
-                var cmd = Console.ReadLine();
-                
-                if(cmd == "0")
-                {
-                    coreModule.GetPropertyValue(coreModule.ModuleProperties[ipropSelect].StatusArg);
-                }
-                else if (cmd == "1")
-                {
-                    foreach(var arg in coreModule.ModuleProperties[ipropSelect].PropertyArgs)
-                    {
-                        Console.WriteLine(arg);
-                    }
-                    var argSelect = Console.ReadLine();
-                    coreModule.SetPropertyValue(coreModule.ModuleProperties[ipropSelect].StatusArg, argSelect);
-                }
-                else if(cmd == "2")
-                {
-                    coreModule.SetFeedback(coreModule.ModuleProperties[ipropSelect].StatusArg);
-
-                }
-
-
+                propertyModule2.GetPropertyValue("Mute");
+                Console.ReadLine();
+                propertyModule2.SetPropertyValue(0, "Mute");
             }
-
-
-            
-
-            
-
-
-
-
 
         }
 
-        
+
+        public static void Module1()
+        {
+            CommandModule commandModule1 = new CommandModule();
+            commandModule1.User = "Tritech";
+            commandModule1.Password = "20!9GolfR";
+            commandModule1.Host = "192.168.0.113";
+
+
+            commandModule1.Initialize("Module1");
+
+
+    }
+
+        public static void Module2()
+        {
+            PropertyModule propertyModule1 = new PropertyModule();
+            propertyModule1.Initialize("Module1");
+
+            propertyModule1.AddProperty(new string[] { "Audio", "Microphones" }, "Mute", new string[] { "Mute", "UnMute" }, true);
+
+ 
+        }
+
     }
 }

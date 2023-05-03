@@ -8,43 +8,14 @@ using System.Text;
 
 namespace RoomKitModulePrototype
 {
-    public class CommunicationBase : ICodecCommunication
+    public abstract class CommunicationBase : ICodecCommunication
     {
+        public CodecResponseParseHandler CodecResponseParseCallback { get; set; }
+        public abstract void Connect();
+        public abstract void SendCommand(string cmd);
+        public abstract void SendCommand(XAPICommandDTO cmd);
 
-        
-        private bool _connected;
-        public bool Connected 
-        {
-            get 
-            {
-                return _connected;
-            }
-            set
-            {
-                if(value == false)
-                {
-                    _connected = value;
-                    
-                    
-                }
-            }
-        }
-        public bool LoggedIn { get; protected set; }
-
-        protected ICoreModule _core;
-
-        public event EventHandler<CodecCommunicationEventArgs> CodecCommStatusChanged;
-
-        public CommunicationBase(ICoreModule core)
-        {
-            _core = core;
-        }
-        public virtual void Connect() { }
-        public virtual void SendCommand(string cmd) { }
-
-        public virtual void SendCommand(XAPICommandDTO cmd) { }
-
-        protected void ResponseRouter(string responseString)
+        /*protected void ResponseRouter(string responseString)
         {
             if (responseString.Contains("Login successful") && !LoggedIn)
             {
@@ -69,17 +40,10 @@ namespace RoomKitModulePrototype
                     Debug.Log("This is a command response");
                     var result = new XAPICommandResponse();
                     result.CommandResponse = name;
-                    _core.CodecResponseRecieved(result);
                     Debug.Log(name);
 
                 }
-            }
-
-
-        }
-
-
-
+            }*/
 
     }
 }
