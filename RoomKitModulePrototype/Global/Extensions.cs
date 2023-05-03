@@ -17,7 +17,7 @@ namespace RoomKitModulePrototype
             }
             catch (JsonReaderException ex)
             {
-                Debug.Log(ex.Message, DebugAlertLevel.Error);
+                //Debug.Log(ex.Message, DebugAlertLevel.Error);
                 return false;
             }
         }

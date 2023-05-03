@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace RoomKitModulePrototype
@@ -13,6 +14,9 @@ namespace RoomKitModulePrototype
         private string _user = "Tritech";
         private string _password = "20!9GolfR";
         private string _host = "192.168.0.113";
+
+
+
         public CoreModule()
         {
             ModuleType = "Core Module";
@@ -25,32 +29,53 @@ namespace RoomKitModulePrototype
             ModuleProperties = new List<CiscoProperty>();
         }
 
-        void ICoreModule.CodecResponseRecieved(BaseDTO response)
+        void ICoreModule.CodecResponseRecieved(XAPICommandResponse response)
         {
-            
+            foreach(var prop in ModuleProperties)
+            {
+                prop.CheckCommandResult(response);
+            }
 
         }
 
-        public void SendPropertyCommand(int propIndex, int propCommand, string cmdArgs = "")
+        public void SetPropertyValue(string key, string arg)
         {
-            try
-            {
-                XAPICommandDTO cmd;
-                if (cmdArgs != "")
-                   cmd = ModuleProperties[propIndex].CommandList[propCommand].GetCommand(cmdArgs);
-                else
-                   cmd = ModuleProperties[propIndex].CommandList[propCommand].GetCommand();
+            var prop = RetrievePropertyFromList(key);
 
-                SendCommandToCodec(cmd);
-            }
-            catch (Exception)
+            if (prop != null)
             {
-                Debug.Log("Property or command not found in module.", DebugAlertLevel.Error);
+                var cmd = prop.SetState(arg);
+                if (cmd != null)
+                    SendCommandToCodec(cmd);
+            }
+        }
+
+        public void GetPropertyValue(string key)
+        {
+            var prop = RetrievePropertyFromList(key);
+
+            if (prop != null)
+            {
+                var cmd = prop.GetState();
+                if(cmd != null)
+                    SendCommandToCodec(cmd);
+            }
+        }
+
+        public void SetFeedback(string key)
+        {
+            var prop = RetrievePropertyFromList(key);
+
+            if (prop != null)
+            {
+                var cmd = prop.FeedbackRegister();
+                if (cmd != null)
+                    SendCommandToCodec(cmd);
             }
         }
         
 
-        public override void SendCommandToCodec(XAPICommandDTO command)
+        protected override void SendCommandToCodec(XAPICommandDTO command)
         {
             _codec.SendCommand(command);
         }
@@ -65,12 +90,23 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public void AddProperty(string[] path, string key, string[] args)
+        public void AddProperty(string[] path, string key, string[] args, bool feedback = false)
         {
-            var prop = new CiscoProperty(path, key, args, this);
+            var prop = new CiscoProperty(path, key, args, this, feedback);
             ModuleProperties.Add(prop);
         }
 
+
+        private CiscoProperty RetrievePropertyFromList(string key)
+        {
+            if (ModuleProperties.Any(i => i.StatusArg == key))
+                return ModuleProperties.Where(x => x.StatusArg == key).First();
+            else
+            {
+                Debug.Log("No Property Found!");
+                return null;
+            }
+        }
 
     }
 }

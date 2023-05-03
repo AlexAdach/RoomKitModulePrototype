@@ -2,17 +2,38 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace RoomKitModulePrototype
 {
-    public class CommunicationBase
+    public class CommunicationBase : ICodecCommunication
     {
-        public virtual bool Connected { get; protected set; }
+
+        
+        private bool _connected;
+        public bool Connected 
+        {
+            get 
+            {
+                return _connected;
+            }
+            set
+            {
+                if(value == false)
+                {
+                    _connected = value;
+                    
+                    
+                }
+            }
+        }
         public bool LoggedIn { get; protected set; }
 
         protected ICoreModule _core;
+
+        public event EventHandler<CodecCommunicationEventArgs> CodecCommStatusChanged;
 
         public CommunicationBase(ICoreModule core)
         {
@@ -33,7 +54,7 @@ namespace RoomKitModulePrototype
             }
             else if (LoggedIn && Extensions.ValidateJSON(responseString))
             {
-                JObject responseJSON = JObject.Parse(responseString);
+                JObject responseJSON = JObject.Parse(responseString, new JsonLoadSettings { LineInfoHandling = 0 }) ;
 
                 if (responseJSON["CommandResponse"] != null)
                 {
@@ -46,7 +67,9 @@ namespace RoomKitModulePrototype
 
 
                     Debug.Log("This is a command response");
-                    //Debug.Log(cmdRsp.ToString());
+                    var result = new XAPICommandResponse();
+                    result.CommandResponse = name;
+                    _core.CodecResponseRecieved(result);
                     Debug.Log(name);
 
                 }

@@ -6,6 +6,6 @@ namespace RoomKitModulePrototype
 {
     public interface ICoreModule
     {
-        public void CodecResponseRecieved(BaseDTO response);
+        public void CodecResponseRecieved(XAPICommandResponse response);
     }
 }

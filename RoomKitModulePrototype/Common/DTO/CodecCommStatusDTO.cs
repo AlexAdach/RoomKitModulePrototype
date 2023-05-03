@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace RoomKitModulePrototype
+namespace RoomKitModulePrototype.Common.DTO
 {
-    interface ICommand
+    class CodecCommStatusDTO
     {
-       void Execute();
     }
 }

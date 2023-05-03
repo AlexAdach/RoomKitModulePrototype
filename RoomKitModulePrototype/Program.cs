@@ -11,12 +11,9 @@ namespace RoomKitModulePrototype
             CoreModule coreModule = new CoreModule();
             ButtonModule buttonModule = new ButtonModule();
 
-            /*            foreach(var prop in coreModule.ModuleProperties)
-                        {
-                            Debug.Log(prop.Name);
-                        }*/
 
-            coreModule.AddProperty(new string[] { "Audio", "Microphones" }, "Mute", new string[] { "Mute", "UnMute" });
+            coreModule.AddProperty(new string[] { "Audio", "Microphones" }, "Mute", new string[] { "Mute", "UnMute" }, true);
+            coreModule.AddProperty(new string[] { "Standby" }, "State", new string[] { "Activate", "Deactivate", "Halfwake" }, true);
 
 
 
@@ -25,49 +22,43 @@ namespace RoomKitModulePrototype
                 Console.ReadLine();
                 for (var i = 0; i < coreModule.ModuleProperties.Count; i++)
                 {
-                    var name = coreModule.ModuleProperties[i].Name;
-                    string line = i + " - " + name;
+                    var prop = coreModule.ModuleProperties[i];
+
+                    string line = i + " - " + String.Join(" ",prop.Path) + " " + prop.StatusArg;
                     Debug.Log(line);
                 }
 
-                var prop = Console.ReadLine();
-                var iprop = Int32.Parse(prop);
+                //Select a property to affect
+                var propSelect = Console.ReadLine();
+                var ipropSelect = Int32.Parse(propSelect);
 
-                var property = coreModule.ModuleProperties[iprop];
+                Console.WriteLine("0 - GetStatus");
+                Console.WriteLine("1 - SetStatus");
+                Console.WriteLine("2 - SetFeedback");
 
-                for (var i = 0; i < property.CommandList.Count; i++)
-                {
-                    var name = property.CommandList[i].GetType().ToString();
-                    string line = i + " - " + name;
-                    Debug.Log(line);
-                }
+                //Select a command to send
                 var cmd = Console.ReadLine();
-                var icmd = Int32.Parse(cmd);
-
-                var command = property.CommandList[icmd];
-
-                if(command is IHasArguments newCommand)
-                {
-                    var argCommand = (IHasArguments)command;
-                    
-                    foreach(var arg in argCommand.CommandArgs)
-                    {
-                        Debug.Log(arg);
-                    }
-                    var sarg = Console.ReadLine();
-
-                    coreModule.SendPropertyCommand(iprop, icmd, sarg);
-                }
-                else
-                {
-                    coreModule.SendPropertyCommand(iprop, icmd);
-                }
-
-
                 
-                /*                var cmd = Console.ReadLine();
-                                if (program.TestCommands(Int32.Parse(cmd), AudioMute)) 
-                                comm.SendCommand(cmd);*/
+                if(cmd == "0")
+                {
+                    coreModule.GetPropertyValue(coreModule.ModuleProperties[ipropSelect].StatusArg);
+                }
+                else if (cmd == "1")
+                {
+                    foreach(var arg in coreModule.ModuleProperties[ipropSelect].PropertyArgs)
+                    {
+                        Console.WriteLine(arg);
+                    }
+                    var argSelect = Console.ReadLine();
+                    coreModule.SetPropertyValue(coreModule.ModuleProperties[ipropSelect].StatusArg, argSelect);
+                }
+                else if(cmd == "2")
+                {
+                    coreModule.SetFeedback(coreModule.ModuleProperties[ipropSelect].StatusArg);
+
+                }
+
+
             }
 
 
@@ -81,29 +72,6 @@ namespace RoomKitModulePrototype
 
         }
 
-        public bool TestCommands(int num, CiscoProperty prop)
-        {
-            switch (num)
-            {
-                case 1:
-                    prop.GetStatus();
-                return false;
-                case 2:
-                    prop.SetStatus("Mute");
-                    return false;
-                case 3:
-                    prop.SetStatus("UnMute");
-                    return false;
-                default:
-                    return true;
-
-            }
-
-
-
-
-
-
-        }
+        
     }
 }

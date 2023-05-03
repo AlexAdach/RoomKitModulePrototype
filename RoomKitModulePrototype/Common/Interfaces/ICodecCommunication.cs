@@ -11,5 +11,7 @@ namespace RoomKitModulePrototype
         public void Connect();
         public void SendCommand(string cmd);
         public void SendCommand(XAPICommandDTO cmd);
+
+        public event EventHandler<CodecCommunicationEventArgs> CodecCommStatusChanged;
     }
 }

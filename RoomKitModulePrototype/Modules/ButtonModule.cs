@@ -9,6 +9,7 @@ namespace RoomKitModulePrototype
         public ButtonModule()
         {
             ModuleType = "ButtonModule";
+            CoreModuleId = "Module1";
         }
 
         protected override void OnMessageRecieved(object sender, PublisherEventArgs<BaseModule> args)

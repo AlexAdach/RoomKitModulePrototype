@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace RoomKitModulePrototype
 {
-    public class BaseModule : Subscriber<BaseModule>
+    public class BaseModule : Subscriber<BaseModule>, INotifyPropertyChanged
     {
         private static readonly Publisher<BaseModule> _publisher
             = new Publisher<BaseModule>();
         public string ModuleType { get; protected set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
         public BaseModule()
         {
             _publisher.Subscribe(this);
         }
-/*        public void SendGlobalMessage(string message)
-        {
-            var args = new PublisherEventArgs<BaseModule>(this) { Message = message };
-            _publisher.Notify(args);
-        }*/
+
 
         protected override void OnMessageRecieved(object sender, PublisherEventArgs<BaseModule> args)
         {
@@ -28,16 +28,27 @@ namespace RoomKitModulePrototype
             Debug.Log(debug);
         }
 
-        public virtual void SendCommandToCodec(XAPICommandDTO command)
+        protected virtual void SendCommandToCodec(XAPICommandDTO command)
         {
             var args = new PublisherEventArgs<BaseModule>(this) { Message = command };
             _publisher.Notify(args);
         }
 
+        protected virtual void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
 
-        
 
+
+
+
+        /*        public void SendGlobalMessage(string message)
+        {
+            var args = new PublisherEventArgs<BaseModule>(this) { Message = message };
+            _publisher.Notify(args);
+        }*/
 
 
     }

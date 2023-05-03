@@ -6,22 +6,13 @@ using Renci.SshNet.Common;
 
 namespace RoomKitModulePrototype
 {
-    public class SSH : CommunicationBase, ICodecCommunication
+    public class SSH : CommunicationBase
     {
-        public override bool Connected { get 
-            {
-                if (client != null)
-                    return client.IsConnected;
-                else
-                    return false;
-            } 
-        }
-
         private string _user;
         private string _password;
         private string _host;
 
-        private SshClient client;
+        private CiscoSSHClient client;
         private ShellStream stream;
 
 
@@ -30,10 +21,7 @@ namespace RoomKitModulePrototype
             _user = user;
             _password = password;
             _host = host;
-        }
 
-        public override void Connect()
-        {
             //ConnectionInfo connection = new ConnectionInfo("192.168.0.113", 22, "Tritech", "Tritech1!");
             var kauth = new KeyboardInteractiveAuthenticationMethod(_user);
 
@@ -55,12 +43,18 @@ namespace RoomKitModulePrototype
                  _user,
                  kauth);
 
-            client = new SshClient(connectionInfo);
+            client = new CiscoSSHClient(connectionInfo);
+
 
             client.HostKeyReceived += (sender, e) => {
                 e.CanTrust = true;
             };
 
+            client.OnCodecConnectionChanged += OnCodecConnectionChanged;
+        }
+
+        public override void Connect()
+        {
             try
             {
                 client.Connect();
@@ -89,8 +83,18 @@ namespace RoomKitModulePrototype
         private void OnDataRecieved(object sender, ShellDataEventArgs args)
         {            
             var resp = stream.Read();
+            //if(string.IsNullOrEmpty(resp))
             base.ResponseRouter(resp);
+
             Debug.Log(resp);
+        }
+
+        private void OnCodecConnectionChanged(object sender, EventArgs e)
+        {
+
+
+
+
         }
     }
 }
