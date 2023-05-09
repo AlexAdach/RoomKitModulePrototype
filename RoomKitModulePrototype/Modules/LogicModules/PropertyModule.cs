@@ -80,7 +80,7 @@ namespace RoomKitModulePrototype
         /// </summary>
         public void AddProperty(string[] path, string key, string[] args, bool feedback = false)
         {
-            var prop = new CiscoProperty(path, key, args, this, feedback);
+            var prop = new CiscoProperty(path, key, args, feedback);
             ModuleProperties.Add(prop);
         }
         private CiscoProperty RetrievePropertyFromList(string key)
@@ -107,8 +107,6 @@ namespace RoomKitModulePrototype
                 }
             }
         }
-
-
         public override void FromCommandModuleMessageReceived(object sender, InterModuleEventArgs args)
         {
             base.FromCommandModuleMessageReceived(sender, args);
@@ -119,6 +117,14 @@ namespace RoomKitModulePrototype
                 {
                     prop.CheckCommandResult(commandResponse);
                 }
+            }
+            else if(args.Message is XAPIEventResponse eventResponse)
+            {
+                foreach (var prop in ModuleProperties)
+                {
+                    prop.CheckEventResult(eventResponse);
+                }
+
             }
             
         }

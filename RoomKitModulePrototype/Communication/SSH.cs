@@ -75,12 +75,12 @@ namespace RoomKitModulePrototype
             stream?.Write(cmd);
         }
 
-        public override void SendCommand(XAPICommandDTO req)
+        public override void SendCommand(XAPICommand cmd)
         {
-            var cmd = req.CommandString;
-            cmd += "\n";
-            Debug.Log(cmd, DebugAlertLevel.Debug);
-            stream?.Write(cmd);
+            var command = cmd.CommandString();
+            command += "\n";
+            Debug.Log(command, DebugAlertLevel.Debug);
+            stream?.Write(command);
         }
 
         private void OnDataRecieved(object sender, ShellDataEventArgs args)

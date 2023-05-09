@@ -50,7 +50,7 @@ namespace RoomKitModulePrototype
             dispatcher.SetCommsSubscriptions(this);
         }
 
-        protected virtual void SendCommandToCodec(XAPICommandDTO command)
+        protected virtual void SendCommandToCodec(XAPICommand command)
         {
             ToCommsModuleMessageSent?.Invoke(this, new InterModuleEventArgs(command));
         }

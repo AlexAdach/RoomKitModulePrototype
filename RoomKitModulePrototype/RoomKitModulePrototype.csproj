@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Remove="CiscoProperty\PropertyBuilder.cs" />
+    <Compile Remove="Common\DTO\XAPICommandDTO.cs" />
     <Compile Remove="Modules\ButtonModule.cs" />
     <Compile Remove="Modules\CoreModule.cs" />
   </ItemGroup>

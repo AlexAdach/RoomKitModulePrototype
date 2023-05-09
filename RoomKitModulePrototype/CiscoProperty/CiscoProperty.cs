@@ -8,18 +8,13 @@ namespace RoomKitModulePrototype
 {
     public class CiscoProperty
     {
-        //public readonly string FriendlyName;
-
-
         private string[] _path; //Heirarchical Path of property
         private StringCollection _propertyArgs; //Arguments for property State
         private StringCollection _setResultArgs;
+        private StringCollection _eventStatusArgs;
         private string _statusArg; //Parent state string (for xStatus, xEvent)
 
-
         private bool _feedback;
-
-        private BaseModule _module;
 
         private string _currentStateString;
 
@@ -29,41 +24,39 @@ namespace RoomKitModulePrototype
 
         public StringCollection PropertyArgs { get { return _propertyArgs; } }
 
-        //private ICodecCommunication _comms;
-
-        public CiscoProperty(string[] path, string statusArg, string[] args, BaseModule module, bool feedback = false)
+        public CiscoProperty(string[] path, string statusArg, string[] args, bool feedback = false)
         {
             _path = path;
             _statusArg = statusArg;
             _propertyArgs = new StringCollection();
             _setResultArgs = new StringCollection();
+            _eventStatusArgs = new StringCollection();
             _propertyArgs.AddRange(args);
-            _module = module;
             _feedback = feedback;
             
             foreach(var propArg in _propertyArgs)
             {
                 var child = _path[_path.Length - 1];
                 var result = child + propArg + "Result";
+                var status = child + propArg + "Status";
                 _setResultArgs.Add(result);
+                _eventStatusArgs.Add(status);
             }
+
+
         }
 
-        public XAPICommandDTO GetState()
+        public XAPICommand GetState()
         {
-            var path = string.Join(" ", _path);
-            var cmdString = string.Join(" ", "xStatus", path, _statusArg);
-            return new XAPICommandDTO { Command = "xStatus", Path = _path, Argument = _statusArg, CommandString = cmdString };
+            return new XAPICommand(XAPICommandType.XStatus, _path, _statusArg);
         }
 
-        public XAPICommandDTO SetState(string arg)
+        public XAPICommand SetState(string arg)
         {
             if (_propertyArgs.Contains(arg))
             {
                 var i = _propertyArgs.IndexOf(arg);
-                var path = string.Join(" ", _path);
-                var cmd = string.Join(" ", "xCommand", path, _propertyArgs[i]);
-                return new XAPICommandDTO { Command = "xCommand", Path = _path, Argument = _propertyArgs[i], CommandString = cmd };
+                return new XAPICommand(XAPICommandType.XCommand, _path, _propertyArgs[i]);
             }
             else
             {
@@ -71,13 +64,12 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public XAPICommandDTO SetState(int arg)
+        public XAPICommand SetState(int arg)
         {
             if (arg <= _propertyArgs.Count && arg > 0)
             {
                 var i = arg;
-                var cmd = string.Join(" ", "xCommand", _path, _propertyArgs[i]);
-                return new XAPICommandDTO { Command = "xCommand", Path = _path, Argument = _propertyArgs[i], CommandString = cmd };
+                return new XAPICommand(XAPICommandType.XCommand, _path, _propertyArgs[i]);
             }
             else
             {
@@ -85,12 +77,9 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public XAPICommandDTO FeedbackRegister()
-        {          
-            var pathslash = "Event/" + string.Join("/", _path);
-
-            var cmd = "xFeedback Register " + pathslash + _statusArg + "Status";
-            return new XAPICommandDTO { Command = "xFeedback Register", Path = _path, Argument = _statusArg, CommandString = cmd };
+        public XAPICommand FeedbackRegister()
+        {
+            return new XAPICommand(XAPICommandType.XFeedbackRegister, _path, _statusArg);
         }
 
         public void CheckCommandResult(XAPICommandResponse resp)
@@ -101,7 +90,16 @@ namespace RoomKitModulePrototype
                 _currentStateString = _propertyArgs[i];
                 Debug.Log("Property State Changed!", DebugAlertLevel.Debug);
             }
+        }
 
+        public void CheckEventResult(XAPIEventResponse resp)
+        {
+            if (_eventStatusArgs.Contains(resp.EventName))
+            {
+                
+                //_currentStateString = _propertyArgs[i];
+                Debug.Log($"Property Event Recorded! {resp.EventName} - {resp.EventValue}", DebugAlertLevel.Debug);
+            }
         }
     }
 }

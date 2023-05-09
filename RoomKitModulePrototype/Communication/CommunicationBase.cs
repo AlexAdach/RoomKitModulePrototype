@@ -13,7 +13,7 @@ namespace RoomKitModulePrototype
         public CodecResponseParseHandler CodecResponseParseCallback { get; set; }
         public abstract void Connect();
         public abstract void SendCommand(string cmd);
-        public abstract void SendCommand(XAPICommandDTO cmd);
+        public abstract void SendCommand(XAPICommand cmd);
 
         /*protected void ResponseRouter(string responseString)
         {
