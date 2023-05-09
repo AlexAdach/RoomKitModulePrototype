@@ -141,6 +141,7 @@ namespace RoomKitModulePrototype
 
                 if (responseJSON["CommandResponse"] != null)
                 {
+                    Debug.Log($"Command Module {ModuleID} - Command Response Received from Codec.", DebugAlertLevel.DebugComms);
                     var cmdRsp = (JObject)responseJSON["CommandResponse"];
 
                     var name = cmdRsp.DescendantsAndSelf() // Loop through tokens in or under the root container, in document order. 
@@ -149,7 +150,7 @@ namespace RoomKitModulePrototype
                         .FirstOrDefault();               // And take the first.
 
 
-                    Debug.Log("This is a command response");
+                   
                     var result = new XAPICommandResponse();
                     result.CommandResponse = name;
                     CommandModuleMessageSent.Invoke(this, new InterModuleEventArgs(result));
@@ -157,7 +158,7 @@ namespace RoomKitModulePrototype
                 }
                 else if(responseJSON["Event"]!= null)
                 {
-                    Debug.Log($"Command Module {ModuleID} - Event Received from Codec.", DebugAlertLevel.Debug);
+                    Debug.Log($"Command Module {ModuleID} - Event Received from Codec.", DebugAlertLevel.DebugComms);
 
                     var eventRsp = (JObject)responseJSON["Event"].First.First;
 
@@ -192,7 +193,7 @@ namespace RoomKitModulePrototype
         /// </summary>
         public void LogicModuleMessageReceived(object sender, InterModuleEventArgs args)
         {
-            Debug.Log("Command Module received message from logic module.", DebugAlertLevel.Debug);
+            Debug.Log("Command Module received message from logic module.", DebugAlertLevel.DebugCode);
             if (args.Message is XAPICommand msg)
                 _codec.SendCommand(msg);
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace RoomKitModulePrototype
@@ -8,6 +9,8 @@ namespace RoomKitModulePrototype
         static void Main(string[] args)
         {
             Program program = new Program();
+            
+
 
             Thread CallModule1 = new Thread(Module1);
             CallModule1.Start();
@@ -19,13 +22,24 @@ namespace RoomKitModulePrototype
             propertyModule2.Initialize("Module1");
 
             propertyModule2.AddProperty(new string[] { "Audio", "Microphones" }, "Mute", new string[] { "Mute", "UnMute" }, true);
+            propertyModule2.AddProperty(new string[] { "Standby" }, "State", new string[] { "Activate", "Deactivate", "HalfWake" }, true);
+            propertyModule2.AddProperty(new string[] { "Video", "Input" }, "MainVideoSource", new string[] { "SetMainVideoSource ConnectorId: 1", "SetMainVideoSource ConnectorId: 2" });
+            propertyModule2.AddProperty(new string[] { "Conference", "Presentation", "LocalInstance" }, "SendingMode", new string[] { "LocalOnly", "LocalRemote", "Off" }, true);
 
+               
             while (true)
             {
-                Console.ReadLine();
-                propertyModule2.GetPropertyValue("Mute");
-                Console.ReadLine();
-                propertyModule2.SetPropertyValue(0, "Mute");
+                var console = Console.ReadLine();
+                Random random = new Random();
+                int randomProp = random.Next(0, propertyModule2.ModuleProperties.Count);
+                int setOrGet = random.Next(1, 3);
+                if (setOrGet == 1)
+                    propertyModule2.GetPropertyValue(randomProp);
+                else
+                {
+                    int randomArg = random.Next(0, propertyModule2.ModuleProperties[randomProp].PropertyArgs.Count);
+                    propertyModule2.SetPropertyValue(randomProp, randomArg);
+                }
             }
 
         }

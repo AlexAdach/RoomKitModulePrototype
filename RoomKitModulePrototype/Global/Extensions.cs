@@ -31,7 +31,7 @@ namespace RoomKitModulePrototype
                 case XAPICommandType.XConfiguration:
                     return "xConfiguration";
                 case XAPICommandType.XFeedbackRegister:
-                    return "xFeedback Register";
+                    return "xFeedback register";
                 case XAPICommandType.XStatus:
                     return "xStatus";
                 default:

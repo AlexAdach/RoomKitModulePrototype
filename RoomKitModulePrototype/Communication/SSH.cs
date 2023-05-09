@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Renci.SshNet;
 using Renci.SshNet.Common;
+using System.Threading;
 
 namespace RoomKitModulePrototype
 {
@@ -16,6 +17,8 @@ namespace RoomKitModulePrototype
 
         private CiscoSSHClient client;
         private ShellStream stream;
+
+        ManualResetEvent mre = new ManualResetEvent(false);
 
         public SSH(string user, string password, string host) : base()
         {
@@ -71,7 +74,7 @@ namespace RoomKitModulePrototype
         public override void SendCommand(string cmd)
         {
             cmd += "\n";
-            Debug.Log(cmd, DebugAlertLevel.Debug);
+            Debug.Log(cmd, DebugAlertLevel.DebugComms);
             stream?.Write(cmd);
         }
 
@@ -79,14 +82,23 @@ namespace RoomKitModulePrototype
         {
             var command = cmd.CommandString();
             command += "\n";
-            Debug.Log(command, DebugAlertLevel.Debug);
-            stream?.Write(command);
+            Debug.Log(command, DebugAlertLevel.DebugComms);
+            //stream?.Write(command);
+            WriteToStreamAsync(command);
+        }
+
+        private void WriteToStreamAsync(string s)
+        {
+
+            stream?.Write(s);
+            mre.WaitOne();
+
         }
 
         private void OnDataRecieved(object sender, ShellDataEventArgs args)
         {            
             var resp = stream.Read();
-
+            mre.Set();
             var handler = CodecResponseParseCallback;
 
             Debug.Log(resp, DebugAlertLevel.DebugComms);

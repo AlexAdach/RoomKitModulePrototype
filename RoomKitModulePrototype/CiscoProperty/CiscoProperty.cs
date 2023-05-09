@@ -8,15 +8,16 @@ namespace RoomKitModulePrototype
 {
     public class CiscoProperty
     {
-        private string[] _path; //Heirarchical Path of property
-        private StringCollection _propertyArgs; //Arguments for property State
-        private StringCollection _setResultArgs;
-        private StringCollection _eventStatusArgs;
-        private string _statusArg; //Parent state string (for xStatus, xEvent)
+        protected string[] _path; //Heirarchical Path of property
+        protected StringCollection _propertyArgs; //Arguments for property State
+        protected StringCollection _setResultArgs;
+        protected StringCollection _eventStatusArgs;
+        
+        protected string _statusArg; //Parent state string (for xStatus, xEvent)
 
-        private bool _feedback;
+        protected bool _feedback;
 
-        private string _currentStateString;
+        protected string _currentStateString;
 
         public string[] Path { get { return _path; } }
         public string StatusArg { get { return _statusArg; } }
@@ -42,8 +43,6 @@ namespace RoomKitModulePrototype
                 _setResultArgs.Add(result);
                 _eventStatusArgs.Add(status);
             }
-
-
         }
 
         public XAPICommand GetState()
@@ -51,7 +50,7 @@ namespace RoomKitModulePrototype
             return new XAPICommand(XAPICommandType.XStatus, _path, _statusArg);
         }
 
-        public XAPICommand SetState(string arg)
+        public virtual XAPICommand SetState(string arg)
         {
             if (_propertyArgs.Contains(arg))
             {
@@ -64,7 +63,7 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public XAPICommand SetState(int arg)
+        public virtual XAPICommand SetState(int arg)
         {
             if (arg <= _propertyArgs.Count && arg > 0)
             {

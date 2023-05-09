@@ -45,10 +45,9 @@ namespace RoomKitModulePrototype
             }
             else
             {
-                //Concatenate path with slashes (Cause cisco is very consistent....)
-                var pathslash = "Event/" + string.Join("/", _path);
+                var pathslash = "Status/" + string.Join("/", _path);
                 var prefix = Extensions.CommandTypeToString(_type);
-                var cmd = prefix + " " + pathslash + _command + "Status";
+                var cmd = prefix + " " + pathslash + "/" + _command;
                 return cmd;
             }
         }

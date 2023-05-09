@@ -8,12 +8,10 @@ namespace RoomKitModulePrototype
     public class PropertyModule : LogicModule
     {
         public List<CiscoProperty> ModuleProperties = new List<CiscoProperty>();
-
         public PropertyModule()
         {
             ModuleType = "Property Module";
         }
-
         #region PropertyCommands
         public void SetPropertyValue(string key, string arg)
         {
@@ -29,6 +27,15 @@ namespace RoomKitModulePrototype
         public void SetPropertyValue(int i, string arg)
         {
             if(i >= 0 && i <= ModuleProperties.Count - 1)
+            {
+                var cmd = ModuleProperties[i].SetState(arg);
+                if (cmd != null)
+                    SendCommandToCodec(cmd);
+            }
+        }
+        public void SetPropertyValue(int i, int arg)
+        {
+            if (i >= 0 && i <= ModuleProperties.Count - 1)
             {
                 var cmd = ModuleProperties[i].SetState(arg);
                 if (cmd != null)
@@ -83,6 +90,7 @@ namespace RoomKitModulePrototype
             var prop = new CiscoProperty(path, key, args, feedback);
             ModuleProperties.Add(prop);
         }
+
         private CiscoProperty RetrievePropertyFromList(string key)
         {
             if (ModuleProperties.Any(i => i.StatusArg == key))

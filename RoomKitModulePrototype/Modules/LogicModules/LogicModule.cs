@@ -67,7 +67,7 @@ namespace RoomKitModulePrototype
 
         public virtual void FromCommandModuleMessageReceived(object sender, InterModuleEventArgs args)
         {
-            Debug.Log($"Logic Module received message from Command Module.", DebugAlertLevel.Debug);
+            Debug.Log($"Logic Module received message from Command Module.", DebugAlertLevel.DebugCode);
 
             if(args.Message is CodecCommStatusDTO codecStatus)
             {
