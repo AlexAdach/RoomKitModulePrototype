@@ -8,6 +8,8 @@ namespace RoomKitModulePrototype
     {
         public event EventHandler<InterModuleEventArgs> ToCommsModuleMessageSent = delegate { };
 
+        public delegate void SendCommandToCodecDelegate(XAPICommand command);
+
         protected bool _codecConnected;
         protected bool _codecLoggedIn;
 

@@ -179,14 +179,46 @@ namespace RoomKitModulePrototype
 
                         CommandModuleMessageSent.Invoke(this, new InterModuleEventArgs(eventResponse));
                     }
-                    
-                    
+                }
+                else if(responseJSON["Status"] != null)
+                {
+
+                    Debug.Log($"Command Module {ModuleID} - Status Received from Codec.", DebugAlertLevel.DebugComms);
 
 
-                    
+                    // Parse JSON string
+                    //JObject jsonObject = JObject.Parse(json);
+                    var statusHeirachy = responseJSON.Descendants().OfType<JProperty>();
+                    statusHeirachy = statusHeirachy.Reverse();
+
+                    string value = statusHeirachy.First().Value.Value<string>();
+
+                    statusHeirachy = statusHeirachy.Skip(1);
+                    string stateArgProperty = statusHeirachy.First().Name;
+                    statusHeirachy = statusHeirachy.Skip(1);
+
+                    List<string> pathlist = new List<string>();
+
+                    while(statusHeirachy.Count() > 1)
+                    {
+                        pathlist.Add(statusHeirachy.First().Name);
+                        statusHeirachy = statusHeirachy.Skip(1);
+                    }
+
+                    var statusResponse = new XAPIStatusResponse();
+
+                    statusResponse.StateArgument = stateArgProperty;
+                    statusResponse.Value = value;
+                    pathlist.Reverse();
+                    statusResponse.Path = pathlist.ToArray();
+
+                    CommandModuleMessageSent.Invoke(this, new InterModuleEventArgs(statusResponse));
+
                 }
             }
         }
+
+        #region Events
 
         /// <summary>
         /// This method handles all messages received from child modules.
@@ -207,7 +239,7 @@ namespace RoomKitModulePrototype
             //Debug.Log($"Codec Status {status.CodecConnected} {status.CodecLoggedIn}");
             CommandModuleMessageSent.Invoke(this, new InterModuleEventArgs(status));
         }
-
+        #endregion Events
 
     }
 }

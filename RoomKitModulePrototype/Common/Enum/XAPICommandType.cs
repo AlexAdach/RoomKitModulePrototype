@@ -10,6 +10,5 @@ namespace RoomKitModulePrototype
         XConfiguration,
         XStatus,
         XFeedbackRegister
-
     }
 }
