@@ -4,11 +4,13 @@ using System.Text;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System.Threading;
+using System.Threading.Tasks;
+using System.IO;
 
 namespace RoomKitModulePrototype
 {
     //public delegate void CodecResponseReceivedHandler(object sender, ShellDataEventArgs args);
-    
+
     public class SSH : CommunicationBase
     {
         private string _user;
@@ -19,6 +21,7 @@ namespace RoomKitModulePrototype
         private ShellStream stream;
 
         ManualResetEvent mre = new ManualResetEvent(false);
+        //TaskCompletionSource 
 
         public SSH(string user, string password, string host) : base()
         {
@@ -50,7 +53,8 @@ namespace RoomKitModulePrototype
             client = new CiscoSSHClient(connectionInfo);
 
 
-            client.HostKeyReceived += (sender, e) => {
+            client.HostKeyReceived += (sender, e) =>
+            {
                 e.CanTrust = true;
             };
 
@@ -63,47 +67,85 @@ namespace RoomKitModulePrototype
             {
                 client.Connect();
                 stream = client.CreateShellStream("Default", 0, 0, 0, 0, 1024);
-                stream.DataReceived += OnDataRecieved;
+                stream.DataReceived += OnStreamDataReceived;
             }
             catch (Exception e)
             {
                 Debug.Log($"Error connecting SSH - {e.Message}");
-            }    
+            }
         }
 
-        public override void SendCommand(string cmd)
+        public override void SendString(string cmd)
         {
-            cmd += "\n";
-            Debug.Log(cmd, DebugAlertLevel.DebugComms);
-            stream?.Write(cmd);
+            WriteToStreamAsync(cmd);
         }
-
-        public override void SendCommand(XAPICommand cmd)
+        public override void SendCommand(XAPIBaseCommand cmd)
         {
-            var command = cmd.CommandString();
-            command += "\n";
-            Debug.Log(command, DebugAlertLevel.DebugComms);
-            //stream?.Write(command);
-            WriteToStreamAsync(command);
+            WriteToStreamAsync(cmd.CommandString());
         }
 
-        private void WriteToStreamAsync(string s)
+        
+        private async void WriteToStreamAsync(string cmdstring)
         {
+            /*            Debug.Log($"Command Sent: {cmd}", DebugAlertLevel.DebugComms);
+                        cmd += "\n";
+                        stream?.Write(cmd);
+                        mre.WaitOne();*/
 
-            stream?.Write(s);
-            mre.WaitOne();
+            cmdstring += "\n";
+            Debug.Log(cmdstring);
+            using (var shellStream = client.CreateShellStream("custom", 80, 24, 800, 600, 1024))
+            {
+                var outputBuilder = new StringBuilder();
+
+                // Send initial command
+                shellStream.WriteLine(cmdstring);
+
+                // Register a callback to handle the continuous output asynchronously
+                var outputWaitHandle = new AutoResetEvent(false);
+                var outputReader = new StreamReader(shellStream);
+                var outputTask = Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        string line = await outputReader.ReadLineAsync();
+                        if (line == null)
+                            break;
+                        outputBuilder.AppendLine(line);
+
+                        // Process the output as needed
+                        Console.WriteLine(line);
+                    }
+
+                    outputWaitHandle.Set();
+                });
+
+                // Wait for the output reading to complete
+                await Task.Run(() => outputWaitHandle.WaitOne());
+
+                // Perform any additional cleanup or actions
+
+                outputReader.Close();
+            }
 
         }
 
-        private void OnDataRecieved(object sender, ShellDataEventArgs args)
-        {            
-            var resp = stream.Read();
-            mre.Set();
+        private void OnStreamDataReceived(object sender, ShellDataEventArgs args)
+        {
+            var receivedData = stream.Read();
             var handler = CodecResponseParseCallback;
 
-            Debug.Log(resp, DebugAlertLevel.DebugComms);
-            handler.Invoke(resp);
+            Debug.Log("<<<<RAW Response Start>>>");
+            Debug.Log(receivedData.AddCharacterOnLineFeed());
+            Debug.Log("<<<<RAW Response End>>>");
+
+            if (!string.IsNullOrWhiteSpace(receivedData)) 
+                handler.Invoke(receivedData);
+
+            //mre.Set();
         }
+
+
 
         private void OnCodecConnectionChanged(object sender, EventArgs e)
         {

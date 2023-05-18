@@ -8,7 +8,7 @@ namespace RoomKitModulePrototype
     {
         public event EventHandler<InterModuleEventArgs> ToCommsModuleMessageSent = delegate { };
 
-        public delegate void SendCommandToCodecDelegate(XAPICommand command);
+        public delegate void SendCommandToCodecDelegate(XAPIBaseCommand command);
 
         protected bool _codecConnected;
         protected bool _codecLoggedIn;
@@ -52,7 +52,7 @@ namespace RoomKitModulePrototype
             dispatcher.SetCommsSubscriptions(this);
         }
 
-        protected virtual void SendCommandToCodec(XAPICommand command)
+        protected virtual void SendCommandToCodec(XAPIBaseCommand command)
         {
             ToCommsModuleMessageSent?.Invoke(this, new InterModuleEventArgs(command));
         }

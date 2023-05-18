@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RoomKitModulePrototype
 {
-    public class XAPIEventResponse : BaseDTO
+    public class XAPIEventResponse : XAPIBaseResponse
     {
         public string EventName { get; set; }
         public string EventValue { get; set; }

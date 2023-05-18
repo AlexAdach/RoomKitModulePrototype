@@ -4,21 +4,22 @@ using System.Text;
 
 namespace RoomKitModulePrototype
 {
-    public class XAPICommand : BaseDTO
+    public class XAPIStateCommand : XAPIBaseCommand
     {
         private XAPICommandType _type;
         private string[] _path;
-        private string _command;
+        private string _argument;
         private Dictionary<string, string> _parameters = new Dictionary<string, string>();
 
-        public XAPICommand(XAPICommandType type, string[] path, string command, Dictionary<string, string> parameters = null)
+
+        public XAPIStateCommand(XAPICommandType type, string[] path, string argument, Dictionary<string, string> parameters = null)
         {
             _type = type;
             _path = path;
-            _command = command;
+            _argument = argument;
             _parameters = parameters;
         }
-        public string CommandString()
+        public override string CommandString()
         {
             if (_type != XAPICommandType.XFeedbackRegister)
             {
@@ -27,14 +28,14 @@ namespace RoomKitModulePrototype
                 //Get the string version of the command type.
                 var prefix = Extensions.CommandTypeToString(_type);
                 //Create the full command string.
-                var fullstring = string.Join(" ", prefix, path, _command);
+                var fullstring = string.Join(" ", prefix, path, _argument);
 
                 if (_parameters != null)
                 {
                     string parameterString = "";
                     foreach (var parameter in _parameters)
                     {
-                        parameterString += parameter.Key + ": " +  "\"" + parameter.Value + "\"" + " ";
+                        parameterString += parameter.Key + ": " + "\"" + parameter.Value + "\"" + " ";
                     }
                     return fullstring + " " + parameterString;
                 }
@@ -47,7 +48,7 @@ namespace RoomKitModulePrototype
             {
                 var pathslash = "Status/" + string.Join("/", _path);
                 var prefix = Extensions.CommandTypeToString(_type);
-                var cmd = prefix + " " + pathslash + "/" + _command;
+                var cmd = prefix + " " + pathslash + "/" + _argument;
                 return cmd;
             }
         }

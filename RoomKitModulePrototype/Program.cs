@@ -18,36 +18,16 @@ namespace RoomKitModulePrototype
             Thread CallModule2 = new Thread(Module2);
             CallModule2.Start();
 
-            /*PropertyModule propertyModule2 = new PropertyModule();
-            propertyModule2.Initialize("Module1");
-
-            propertyModule2.AddProperty(new string[] { "Audio", "Microphones" }, "Mute", new string[] { "Mute", "UnMute" }, true);
-            propertyModule2.AddProperty(new string[] { "Standby" }, "State", new string[] { "Activate", "Deactivate", "HalfWake" }, true);
-            propertyModule2.AddProperty(new string[] { "Video", "Input" }, "MainVideoSource", new string[] { "SetMainVideoSource ConnectorId: 1", "SetMainVideoSource ConnectorId: 2" });
-            propertyModule2.AddProperty(new string[] { "Conference", "Presentation", "LocalInstance" }, "SendingMode", new string[] { "LocalOnly", "LocalRemote", "Off" }, true);*/
-
+           
             EssentialsModule essentialsModule = new EssentialsModule();
             essentialsModule.Initialize("Module1");
-               
-/*            while (true)
-            {
-                var console = Console.ReadLine();
-                Random random = new Random();
-                int randomProp = random.Next(0, propertyModule2.ModuleProperties.Count);
-                int setOrGet = random.Next(1, 3);
-                if (setOrGet == 1)
-                    propertyModule2.GetPropertyValue(randomProp);
-                else
-                {
-                    int randomArg = random.Next(0, propertyModule2.ModuleProperties[randomProp].PropertyArgs.Count);
-                    propertyModule2.SetPropertyValue(randomProp, randomArg);
-                }
-            }*/
 
-            while(true)
+            while (true)
             {
                 Console.ReadLine();
-                essentialsModule.StandbyState.SetState(0);
+                essentialsModule.CameraSelection.SetValue(new int[,] {{ 0, 0 }});
+                Console.ReadLine();
+                essentialsModule.CameraSelection.SetValue(new int[,] { { 0, 1 } });
                 Console.ReadLine();
                 essentialsModule.StandbyState.SetState(1);
                 Console.ReadLine();
@@ -55,8 +35,8 @@ namespace RoomKitModulePrototype
                 essentialsModule.PrivacyMuteState.SetState(1);
                 //Console.ReadLine();
 
-                Console.WriteLine($"Standby - {essentialsModule.StandbyState.CurrentStateIndex} - {essentialsModule.StandbyState.CurrentStateString}");
-                Console.WriteLine($"Microphones - {essentialsModule.PrivacyMuteState.CurrentStateIndex} - {essentialsModule.PrivacyMuteState.CurrentStateString}");
+                Console.WriteLine($"Standby - {essentialsModule.StandbyState.CurrentStatusIndex} - {essentialsModule.StandbyState.CurrentStatusString}");
+                Console.WriteLine($"Microphones - {essentialsModule.PrivacyMuteState.CurrentStatusIndex} - {essentialsModule.PrivacyMuteState.CurrentStatusString}");
 
             }
 
@@ -78,10 +58,7 @@ namespace RoomKitModulePrototype
 
         public static void Module2()
         {
-            PropertyModule propertyModule1 = new PropertyModule();
-            propertyModule1.Initialize("Module1");
 
-            propertyModule1.AddProperty(new string[] { "Audio", "Microphones" }, "Mute", new string[] { "Mute", "UnMute" }, true);
 
  
         }

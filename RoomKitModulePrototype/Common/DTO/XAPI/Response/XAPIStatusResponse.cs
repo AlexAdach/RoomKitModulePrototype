@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RoomKitModulePrototype
 {
-    public class XAPIStatusResponse : BaseDTO
+    public class XAPIStatusResponse : XAPIBaseResponse
     {
         public string StateArgument { get; set; }
         public string Value { get; set; }

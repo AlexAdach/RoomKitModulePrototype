@@ -13,11 +13,29 @@ namespace RoomKitModulePrototype
             try
             {
                 JToken.Parse(s, new JsonLoadSettings { LineInfoHandling = 0 });
+                //JToken.Parse(s);
                 return true;
             }
-            catch 
+            catch
             {
                 //Debug.Log(ex.Message, DebugAlertLevel.Error);
+                return false;
+            }
+        }
+
+        public static bool JSONNotEmpty(this string s)
+        {
+            try
+            {
+                var total = JObject.Parse(s).Count;
+
+                if (total > 0)
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
                 return false;
             }
         }

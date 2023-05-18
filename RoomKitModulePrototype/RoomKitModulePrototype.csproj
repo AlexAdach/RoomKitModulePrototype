@@ -6,18 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CiscoProperty\**" />
+    <EmbeddedResource Remove="CiscoProperty\**" />
+    <None Remove="CiscoProperty\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Common\DTO\XAPICommandDTO.cs" />
     <Compile Remove="Modules\ButtonModule.cs" />
     <Compile Remove="Modules\CoreModule.cs" />
+    <Compile Remove="Modules\LogicModules\PropertyModule.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Common\Delegate\" />
   </ItemGroup>
 
 </Project>

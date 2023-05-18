@@ -45,17 +45,17 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public XAPICommand GetState()
+        public XAPIStateCommand GetState()
         {
-            return new XAPICommand(XAPICommandType.XStatus, _path, _statusArg);
+            return new XAPIStateCommand(XAPICommandType.XStatus, _path, _statusArg);
         }
 
-        public virtual XAPICommand SetState(string arg)
+        public virtual XAPIStateCommand SetState(string arg)
         {
             if (_propertyArgs.Contains(arg))
             {
                 var i = _propertyArgs.IndexOf(arg);
-                return new XAPICommand(XAPICommandType.XCommand, _path, _propertyArgs[i]);
+                return new XAPIStateCommand(XAPICommandType.XCommand, _path, _propertyArgs[i]);
             }
             else
             {
@@ -63,12 +63,12 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public virtual XAPICommand SetState(int arg)
+        public virtual XAPIStateCommand SetState(int arg)
         {
             if (arg <= _propertyArgs.Count && arg > 0)
             {
                 var i = arg;
-                return new XAPICommand(XAPICommandType.XCommand, _path, _propertyArgs[i]);
+                return new XAPIStateCommand(XAPICommandType.XCommand, _path, _propertyArgs[i]);
             }
             else
             {
@@ -76,9 +76,9 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public XAPICommand FeedbackRegister()
+        public XAPIStateCommand FeedbackRegister()
         {
-            return new XAPICommand(XAPICommandType.XFeedbackRegister, _path, _statusArg);
+            return new XAPIStateCommand(XAPICommandType.XFeedbackRegister, _path, _statusArg);
         }
 
         public void CheckCommandResult(XAPICommandResponse resp)

@@ -45,8 +45,9 @@ namespace RoomKitModulePrototype
                     _codecLoggedIn = value;
                     if (value == true)
                     {
-                        CodecConnectionStatusChanged();
                         OnCodecLoggedIn();
+                        CodecConnectionStatusChanged();
+
                     }
                 }
             }
@@ -70,14 +71,14 @@ namespace RoomKitModulePrototype
             ModuleID = id;
             dispatcher.RegisterModule(this);
             _codec = new SSH(User, Password, Host);
-            _codec.CodecResponseParseCallback = ResponseRouter;
+            _codec.CodecResponseParseCallback = ResponseDataHandler;
             _codec.Connect();
         }
 
         #region Poll&HeartBeat
         private void OnCodecLoggedIn()
         {
-            _codec.SendCommand("xPreferences outputmode json");
+            _codec.SendString("xPreferences outputmode json");
             _codec.SendCommand(ReturnPeripheralConnectCommand());
             Debug.Log($"Command Module {ModuleID} - Codec Logged In!", DebugAlertLevel.Debug);
             _pollTimer.Enabled = true;
@@ -90,11 +91,11 @@ namespace RoomKitModulePrototype
             {
                 {"ID", macAddress },
             };
-            var heartbeat = new XAPICommand(XAPICommandType.XCommand, new string[] { "Peripherals" }, "HeartBeat", parameters);
-            _codec.SendCommand(heartbeat);
+            var heartbeat = new XAPIStateCommand(XAPICommandType.XCommand, new string[] { "Peripherals" }, "HeartBeat", parameters);
+            //_codec.SendCommand(heartbeat);
 
         }
-        private XAPICommand ReturnPeripheralConnectCommand()
+        private XAPIStateCommand ReturnPeripheralConnectCommand()
         {
             string hardwareInfo = "1";
             string macAddress = "01:02:03:03:05:06";
@@ -117,50 +118,77 @@ namespace RoomKitModulePrototype
                 {"Type", type }
             };
 
-            return new XAPICommand(XAPICommandType.XCommand, new string[] { "Peripherals" }, "Connect", parameters);
+            return new XAPIStateCommand(XAPICommandType.XCommand, new string[] { "Peripherals" }, "Connect", parameters);
 
         }
         #endregion Poll&HeartBeat
 
-        /// <summary>
-        /// This method handles parsing the responses from the codec. Creating relevant DTOs for the types of responses, and sending them over 
-        /// to the child modules.
-        /// </summary>
-        /// <param name="responseString"></param>
-        private void ResponseRouter(string responseString)
+
+        private void ResponseDataHandler(string responseData)
         {
+            Debug.Log("ResponseDataHandler");
             codecConnected = true;
-            if (responseString.Contains("Login successful") && !codecLoggedIn)
+            if (!codecLoggedIn && responseData.Contains("Login successful"))
             {
-                 //*******CHANGE THIS
                 codecLoggedIn = true;
             }
-            else if (codecLoggedIn && Extensions.ValidateJSON(responseString))
+            else if (codecLoggedIn)
             {
-                JObject responseJSON = JObject.Parse(responseString, new JsonLoadSettings { LineInfoHandling = 0 });
+                var separatedJsons = responseData.SeparateJSON();
+                
+                foreach (var json in separatedJsons)
+                {
+                    var trimmed = json.TrimStart();
+                    if (trimmed.ValidateJSON())
+                    {
+                        var responseObject = JObject.Parse(trimmed, new JsonLoadSettings { LineInfoHandling = 0 }).GenerateResponseObject();
+                        CommandModuleMessageSent.Invoke(this, new InterModuleEventArgs(responseObject));
+                    }
+                    else
+                    {
+                        ParseNonJson(json);
+                        break;
+                    }
+                }
+            }
+        }
+        private void ParseNonJson(string response)
+        {
+            Debug.Log($"String Response: {response}");
+        }
+        private void ParseJson(string responseJSON)
+        {
+            codecConnected = true;
 
-                if (responseJSON["CommandResponse"] != null)
+            if (responseJSON.Contains("Login successful") && !codecLoggedIn)
+            {
+                //*******CHANGE THIS
+                codecLoggedIn = true;
+            }
+            else if (codecLoggedIn && Extensions.ValidateJSON(responseJSON))
+            {
+                JObject parsedJSON = JObject.Parse(responseJSON, new JsonLoadSettings { LineInfoHandling = 0 });
+
+                if (parsedJSON["CommandResponse"] != null)
                 {
                     Debug.Log($"Command Module {ModuleID} - Command Response Received from Codec.", DebugAlertLevel.DebugComms);
-                    var cmdRsp = (JObject)responseJSON["CommandResponse"];
+                    var cmdRsp = (JObject)parsedJSON["CommandResponse"];
 
                     var name = cmdRsp.DescendantsAndSelf() // Loop through tokens in or under the root container, in document order. 
                         .OfType<JProperty>()             // For those which are properties
                         .Select(p => p.Name)             // Select the name
                         .FirstOrDefault();               // And take the first.
 
-
-                   
                     var result = new XAPICommandResponse();
                     result.CommandResponse = name;
                     CommandModuleMessageSent.Invoke(this, new InterModuleEventArgs(result));
 
                 }
-                else if(responseJSON["Event"]!= null)
+                else if (parsedJSON["Event"] != null)
                 {
                     Debug.Log($"Command Module {ModuleID} - Event Received from Codec.", DebugAlertLevel.DebugComms);
 
-                    var eventRsp = (JObject)responseJSON["Event"].First.First;
+                    var eventRsp = (JObject)parsedJSON["Event"].First.First;
 
                     var eStatusName = eventRsp.DescendantsAndSelf() // Loop through tokens in or under the root container, in document order. 
                         .OfType<JProperty>()             // For those which are properties
@@ -180,7 +208,7 @@ namespace RoomKitModulePrototype
                         CommandModuleMessageSent.Invoke(this, new InterModuleEventArgs(eventResponse));
                     }
                 }
-                else if(responseJSON["Status"] != null)
+                else if (parsedJSON["Status"] != null)
                 {
 
                     Debug.Log($"Command Module {ModuleID} - Status Received from Codec.", DebugAlertLevel.DebugComms);
@@ -188,7 +216,7 @@ namespace RoomKitModulePrototype
 
                     // Parse JSON string
                     //JObject jsonObject = JObject.Parse(json);
-                    var statusHeirachy = responseJSON.Descendants().OfType<JProperty>();
+                    var statusHeirachy = parsedJSON.Descendants().OfType<JProperty>();
                     statusHeirachy = statusHeirachy.Reverse();
 
                     string value = statusHeirachy.First().Value.Value<string>();
@@ -199,7 +227,7 @@ namespace RoomKitModulePrototype
 
                     List<string> pathlist = new List<string>();
 
-                    while(statusHeirachy.Count() > 1)
+                    while (statusHeirachy.Count() > 1)
                     {
                         pathlist.Add(statusHeirachy.First().Name);
                         statusHeirachy = statusHeirachy.Skip(1);
@@ -217,6 +245,52 @@ namespace RoomKitModulePrototype
                 }
             }
         }
+        private List<string> SeparateJSON(string receivedData)
+        {
+            List<string> jsonList = new List<string>();
+            StringBuilder buffer = new StringBuilder();
+
+            int openingBrackets = 0;  // Count of opening brackets '{'
+            int closingBrackets = 0;  // Count of closing brackets '}'
+
+            // Loop through the received data
+            foreach (char c in receivedData)
+            {
+                buffer.Append(c);
+                if (c == '{')
+                {
+                    openingBrackets++;
+                }
+                else if (c == '}')
+                {
+                    closingBrackets++;
+
+                    if (openingBrackets == closingBrackets)
+                    {
+                        // Complete JSON response
+                        string json = buffer.ToString();
+                        jsonList.Add(json);
+
+                        // Clear the buffer and reset bracket counts for the next response
+                        buffer.Clear();
+                        openingBrackets = 0;
+                        closingBrackets = 0;
+                    }
+                }
+            }
+            // Handle any remaining data in the buffer (in case a complete response is not received yet)
+            if (buffer.Length > 0)
+            {
+                string json = buffer.ToString();
+                if(!string.IsNullOrWhiteSpace(json))
+                {
+                    Debug.Log($"Buffer: {json}");
+                    jsonList.Add(json);
+                }
+            }
+            Debug.Log(jsonList.Count().ToString());
+            return jsonList;
+        }
 
         #region Events
 
@@ -226,7 +300,7 @@ namespace RoomKitModulePrototype
         public void LogicModuleMessageReceived(object sender, InterModuleEventArgs args)
         {
             Debug.Log("Command Module received message from logic module.", DebugAlertLevel.DebugCode);
-            if (args.Message is XAPICommand msg)
+            if (args.Message is XAPIBaseCommand msg)
                 _codec.SendCommand(msg);
         }
 
@@ -240,6 +314,7 @@ namespace RoomKitModulePrototype
             CommandModuleMessageSent.Invoke(this, new InterModuleEventArgs(status));
         }
         #endregion Events
+
 
     }
 }

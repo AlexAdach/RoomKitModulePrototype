@@ -10,8 +10,8 @@ namespace RoomKitModulePrototype
 
         public CodecResponseParseHandler CodecResponseParseCallback { get; set; }
         public void Connect();
-        public void SendCommand(string cmd);
-        public void SendCommand(XAPICommand cmd);
+        public void SendString(string cmd);
+        public void SendCommand(XAPIBaseCommand cmd);
 
         //public event EventHandler<CodecCommunicationEventArgs> CodecCommStatusChanged;
     }

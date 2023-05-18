@@ -11,17 +11,8 @@ namespace RoomKitModulePrototype
     {
         public EventHandler OnCodecConnectionChanged;
 
-
-        public CiscoSSHClient(string host, int port, string username, string password) : base(host, port, username, password)
-        {
-            
-
-        }
-
-        public CiscoSSHClient(ConnectionInfo connectionInfo) : base(connectionInfo)
-        {
-        }
-
+        public CiscoSSHClient(string host, int port, string username, string password) : base(host, port, username, password) { }
+        public CiscoSSHClient(ConnectionInfo connectionInfo) : base(connectionInfo) { }
         protected override void OnConnected()
         {
             base.OnConnected();
