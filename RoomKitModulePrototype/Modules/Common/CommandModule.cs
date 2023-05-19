@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace RoomKitModulePrototype
@@ -13,7 +15,10 @@ namespace RoomKitModulePrototype
         public event EventHandler<InterModuleEventArgs> CommandModuleMessageSent = delegate { };
         private ICodecCommunication _codec;
 
-        private Timer _pollTimer;
+        private AutoResetEvent _txLock = new AutoResetEvent(true);
+
+
+        private System.Timers.Timer _pollTimer;
 
         #region CodecStatus
         private bool _codecConnected;
@@ -46,8 +51,6 @@ namespace RoomKitModulePrototype
                     if (value == true)
                     {
                         OnCodecLoggedIn();
-                        CodecConnectionStatusChanged();
-
                     }
                 }
             }
@@ -61,7 +64,7 @@ namespace RoomKitModulePrototype
         #endregion Credentials
         public CommandModule()
         {
-            _pollTimer = new Timer(10000);
+            _pollTimer = new System.Timers.Timer(10000);
             _pollTimer.Elapsed += OnCodecHeartBeat;
             _pollTimer.AutoReset = true;
 
@@ -78,10 +81,11 @@ namespace RoomKitModulePrototype
         #region Poll&HeartBeat
         private void OnCodecLoggedIn()
         {
-            _codec.SendString("xPreferences outputmode json");
-            _codec.SendCommand(ReturnPeripheralConnectCommand());
             Debug.Log($"Command Module {ModuleID} - Codec Logged In!", DebugAlertLevel.Debug);
+
+            Tx(ReturnPeripheralConnectCommand());
             _pollTimer.Enabled = true;
+            CodecConnectionStatusChanged();
         }
         private void OnCodecHeartBeat(object source, ElapsedEventArgs e)
         {
@@ -123,14 +127,32 @@ namespace RoomKitModulePrototype
         }
         #endregion Poll&HeartBeat
 
-
+        private void Tx(string cmd) { OnTx(cmd); }
+        private void Tx(XAPIBaseCommand cmd) { OnTx(cmd.CommandString()); }
+        private async void OnTx(string cmd)
+        {
+            Thread.CurrentThread.DebugThreadID("COMMAND");
+            _txLock.WaitOne();
+            //_txLock.Reset();
+            cmd += "\n";
+            Debug.Log($"Command sent: {cmd}");
+            _ = Task.Run(() => { _codec.Send(cmd);});
+            
+        }
         private void ResponseDataHandler(string responseData)
         {
-            Debug.Log("ResponseDataHandler");
+            Thread.CurrentThread.DebugThreadID("ParseThread");
+
+            Debug.Log("<<<<RAW Response Start>>>");
+            //Debug.Log(responseData.ShowLineFeed().ShowCarriageReturn());
+            Debug.Log(responseData);
+            Debug.Log("<<<<RAW Response End>>>\n");
+
+
             codecConnected = true;
-            if (!codecLoggedIn && responseData.Contains("Login successful"))
+            if (!codecLoggedIn)
             {
-                codecLoggedIn = true;
+                ParseNonJson(responseData);
             }
             else if (codecLoggedIn)
             {
@@ -151,10 +173,22 @@ namespace RoomKitModulePrototype
                     }
                 }
             }
+
+
+            //_txLock.ReleaseMutex();
+            _txLock.Set();
+                
         }
         private void ParseNonJson(string response)
         {
-            Debug.Log($"String Response: {response}");
+            //Debug.Log($"String Response: {response}");
+
+            if(response.Contains("Login successful"))
+                Tx("xPreferences outputmode json");
+
+            if (response.Contains("xPreferences outputmode json"))
+                codecLoggedIn = true;
+
         }
         private void ParseJson(string responseJSON)
         {
@@ -301,7 +335,7 @@ namespace RoomKitModulePrototype
         {
             Debug.Log("Command Module received message from logic module.", DebugAlertLevel.DebugCode);
             if (args.Message is XAPIBaseCommand msg)
-                _codec.SendCommand(msg);
+                Tx(msg);
         }
 
         private void CodecConnectionStatusChanged()

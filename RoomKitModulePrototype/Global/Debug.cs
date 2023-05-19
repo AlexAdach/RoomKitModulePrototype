@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace RoomKitModulePrototype
 {
     public static class Debug
     {
 
+        private static Mutex mutex = new Mutex();
+
         public static void Log(string s)
         {
-            Console.WriteLine(s);
+            PrintToConsole(s);
         }
 
         public static void Log(string s, DebugAlertLevel level)
@@ -17,8 +22,24 @@ namespace RoomKitModulePrototype
             DebugAlertLevel alertLevel = DebugAlertLevel.Error | DebugAlertLevel.Debug | DebugAlertLevel.DebugComms;
 
             if(FlagsHelper.IsSet(alertLevel, level))
-            Console.WriteLine(s);
+            PrintToConsole(s);
+        }
 
+        private static void PrintToConsole(string s)
+        {
+            mutex.WaitOne();
+            try
+            {
+                Console.WriteLine(s);
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
+        }
+        public static void DebugThreadID(this Thread thread, string info = "")
+        {
+            PrintToConsole($"{info} Thread ID: {thread.ManagedThreadId}");
         }
 
         public static string ShowCarriageReturn(this string input)
@@ -31,7 +52,7 @@ namespace RoomKitModulePrototype
 
                 if (c == '\r')
                 {
-                    stringBuilder.Append("#");
+                    stringBuilder.Append("CR");
                 }
             }
 
@@ -47,7 +68,7 @@ namespace RoomKitModulePrototype
 
                 if (c == '\n')
                 {
-                    stringBuilder.Append("*");
+                    stringBuilder.Append("LF");
                 }
             }
 
@@ -60,6 +81,12 @@ namespace RoomKitModulePrototype
             return string.Join($"&\r\n", lines);
         }
 
+        public static string RemoveCRLF(this string input)
+        {
+            string output = input.Replace("CRLF", "");
+
+            return output;
+        }
         public static string AddCharacterOnLineFeed(this string input)
         {
             string[] lines = input.Split('\n');
@@ -74,6 +101,8 @@ namespace RoomKitModulePrototype
 
             return string.Join("\n", lines);
         }
+
+
     }
 
 

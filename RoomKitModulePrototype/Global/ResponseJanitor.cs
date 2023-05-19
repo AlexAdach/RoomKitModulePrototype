@@ -46,12 +46,28 @@ namespace RoomKitModulePrototype
                 string json = buffer.ToString();
                 if (!string.IsNullOrWhiteSpace(json))
                 {
-                    Debug.Log($"Buffer: {json}");
+                    //Debug.Log($"Buffer: {json}");
                     jsonList.Add(json);
                 }
             }
-            Debug.Log(jsonList.Count().ToString());
+            //Debug.Log(jsonList.Count().ToString());
             return jsonList;
+        }
+
+        public static string RemoveBlankLines(this string input)
+        {
+            string[] lines = input.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            List<string> nonBlankLines = new List<string>();
+
+            foreach (string line in lines)
+            {
+                if (!string.IsNullOrWhiteSpace(line) || !string.IsNullOrEmpty(line))
+                {
+                    nonBlankLines.Add(line);
+                }
+            }
+
+            return string.Join(Environment.NewLine, nonBlankLines);
         }
     }
 }
