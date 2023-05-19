@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace RoomKitModulePrototype
 {
@@ -9,8 +12,10 @@ namespace RoomKitModulePrototype
         //public bool Initialized { get; }
 
         public CodecResponseParseHandler CodecResponseParseCallback { get; set; }
+        public AutoResetEvent CommandLock { get; }
+        public BlockingCollection<string> CommandQueue { get; }
         public void Connect();
-        public void Send(string cmd);
+
         //public void SendString(string cmd);
         //public void SendCommand(XAPIBaseCommand cmd);
 

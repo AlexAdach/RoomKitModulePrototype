@@ -9,16 +9,16 @@ namespace RoomKitModulePrototype
         static void Main(string[] args)
         {
             Program program = new Program();
-            
+
 
 
             Thread CallModule1 = new Thread(Module1);
             CallModule1.Start();
 
-            Thread CallModule2 = new Thread(Module2);
-            CallModule2.Start();
+/*            Thread CallModule2 = new Thread(Module2);
+            CallModule2.Start();*/
 
-           
+
             EssentialsModule essentialsModule = new EssentialsModule();
             essentialsModule.Initialize("Module1");
 

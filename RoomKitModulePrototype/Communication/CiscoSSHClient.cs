@@ -9,7 +9,7 @@ namespace RoomKitModulePrototype
 {
     class CiscoSSHClient : SshClient
     {
-        public EventHandler OnCodecConnectionChanged;
+        public EventHandler<CodecCommunicationEventArgs> OnCodecConnectionChanged;
 
         public CiscoSSHClient(string host, int port, string username, string password) : base(host, port, username, password) { }
         public CiscoSSHClient(ConnectionInfo connectionInfo) : base(connectionInfo) { }

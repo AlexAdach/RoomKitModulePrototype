@@ -14,9 +14,14 @@ namespace RoomKitModulePrototype
     {
         private CiscoSSHClient client;
         private ShellStream stream;
+
         public CodecResponseParseHandler CodecResponseParseCallback { get; set; }
+        public BlockingCollection<string> CommandQueue { get; } = new BlockingCollection<string>();
+        public AutoResetEvent CommandLock { get; } = new AutoResetEvent(false);
+
         public SSH(string user, string password, string host) : base()
         {
+            Task.Run(() => ProcessCommands());
             var kauth = new KeyboardInteractiveAuthenticationMethod(user);
 
             kauth.AuthenticationPrompt += delegate (object sender, AuthenticationPromptEventArgs e)
@@ -35,7 +40,18 @@ namespace RoomKitModulePrototype
             client.HostKeyReceived += (sender, e) => { e.CanTrust = true; };
             client.OnCodecConnectionChanged += OnCodecConnectionChanged;
         }
-
+        private void ProcessCommands()
+        {
+            foreach (string cmd in CommandQueue.GetConsumingEnumerable())
+            {
+                CommandLock.WaitOne(TimeSpan.FromSeconds(5));
+                Thread.CurrentThread.DebugThreadID("Process Commands Thread: ");
+                Debug.Log($"Command sent: {cmd}");
+                var cmddel = cmd + "\n";
+                stream.Write(cmddel);
+                
+            }
+        }
         public void Connect()
         {
             try
@@ -49,26 +65,11 @@ namespace RoomKitModulePrototype
                 Debug.Log($"Error connecting SSH - {e.Message}");
             }
         }
-        public void Send(string cmd)
-        {
-            Thread.CurrentThread.DebugThreadID("SSH");
-            stream.Write(cmd);
-        }
         private void OnStreamDataReceived(object sender, ShellDataEventArgs args)
         {
-
-            //Thread.CurrentThread.DebugThreadID("SSH On Data Received");
-
             var receivedData = stream.Read().RemoveBlankLines();
-
-
-
-            
-
             var handler = CodecResponseParseCallback;
-            
                 handler.Invoke(receivedData);
-
         }
         private void OnCodecConnectionChanged(object sender, EventArgs e)
         {
