@@ -53,21 +53,5 @@ namespace RoomKitModulePrototype
             //Debug.Log(jsonList.Count().ToString());
             return jsonList;
         }
-
-        public static string RemoveBlankLines(this string input)
-        {
-            string[] lines = input.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            List<string> nonBlankLines = new List<string>();
-
-            foreach (string line in lines)
-            {
-                if (!string.IsNullOrWhiteSpace(line) || !string.IsNullOrEmpty(line))
-                {
-                    nonBlankLines.Add(line);
-                }
-            }
-
-            return string.Join(Environment.NewLine, nonBlankLines);
-        }
     }
 }

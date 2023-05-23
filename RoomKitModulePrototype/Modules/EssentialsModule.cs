@@ -8,7 +8,6 @@ namespace RoomKitModulePrototype
     {
         private readonly List<ICiscoStatus> _states;
 
-
         public CiscoState PrivacyMuteState;
         public CiscoState StandbyState;
         public CiscoState SpeakerTrackState;
@@ -63,8 +62,6 @@ namespace RoomKitModulePrototype
                 SendCommandToCodecHandler = SendCommandToCodec
             });
         }
-
-
         protected override void ModulePropertiesBoot()
         {
             base.ModulePropertiesBoot();

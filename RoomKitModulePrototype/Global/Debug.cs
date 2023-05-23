@@ -48,12 +48,11 @@ namespace RoomKitModulePrototype
 
             foreach (char c in input)
             {
-                stringBuilder.Append(c);
-
                 if (c == '\r')
                 {
                     stringBuilder.Append("CR");
                 }
+                stringBuilder.Append(c);
             }
 
             return stringBuilder.ToString();
@@ -64,12 +63,11 @@ namespace RoomKitModulePrototype
 
             foreach (char c in input)
             {
-                stringBuilder.Append(c);
-
                 if (c == '\n')
                 {
                     stringBuilder.Append("LF");
                 }
+                stringBuilder.Append(c);
             }
 
             return stringBuilder.ToString();

@@ -18,8 +18,6 @@ namespace RoomKitModulePrototype
             {
                 int key = keyValuePairs[id, 0];
                 int value = keyValuePairs[id, 1];
-
-                Console.WriteLine(value);
                 //Check to see if the ID index exists
                 if (key < ValueParameters.Length)
                 {

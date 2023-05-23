@@ -10,7 +10,7 @@ namespace RoomKitModulePrototype
     public interface ICodecCommunication
     {
         //public bool Initialized { get; }
-
+        public event EventHandler<CodecConnectionStatusEventArgs> CodecConnectionChanged;
         public CodecResponseParseHandler CodecResponseParseCallback { get; set; }
         public AutoResetEvent CommandLock { get; }
         public BlockingCollection<string> CommandQueue { get; }

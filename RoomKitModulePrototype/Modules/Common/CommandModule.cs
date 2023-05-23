@@ -13,13 +13,16 @@ namespace RoomKitModulePrototype
     public delegate void CodecResponseParseHandler(string response);
     public class CommandModule : BaseModule
     {
-        public event EventHandler<InterModuleEventArgs> CommandModuleMessageSent = delegate { };
         private ICodecCommunication _codec;
         private System.Timers.Timer _pollTimer;
+        public event EventHandler<InterModuleEventArgs> CommandModuleMessageSent = delegate { };
+
+        CiscoValue PeripheralConnect;
 
         #region CodecStatus
         private bool _codecConnected;
         private bool _codecLoggedIn;
+        private bool _codecJSONSet;
         private bool codecConnected
         {
             get
@@ -31,7 +34,7 @@ namespace RoomKitModulePrototype
                     _codecConnected = value;
                     if (value == false)
                     {
-                        CodecConnectionStatusChanged();
+                        BroadcastCodecStatus();
                     }
                 }
             }
@@ -53,7 +56,6 @@ namespace RoomKitModulePrototype
             }
         }
         #endregion CodecStatus
-
         #region Credentials
         public string User { get; set; }
         public string Password { get; set; }
@@ -65,13 +67,35 @@ namespace RoomKitModulePrototype
             _pollTimer.Elapsed += OnCodecHeartBeat;
             _pollTimer.AutoReset = true;
 
+            PeripheralConnect = new CiscoValue()
+            {
+                Path = new string[] { "Peripherals" },
+                StatusArgument = null,
+                FeedbackStates = null,
+                ShouldRegisterFeedback = false,
+                SetValueArgument = "Connect",
+                ValueParameters = new CiscoParameter[]
+                {
+                    new CiscoParameter("HardwareInfo", new string[] { "1" }),
+                    new CiscoParameter("ID", new string[] { "01:02:03:03:05:06" }),
+                    new CiscoParameter("Name", new string[] { "Crestron" }),
+                    new CiscoParameter("NetworkAddress", new string[] { "192.168.0.143" }),
+                    new CiscoParameter("SerialNumber", new string[] { "123456789" }),
+                    new CiscoParameter("SoftwareInfo", new string[] { ".NET 4.7.2 Console App" }),
+                    new CiscoParameter("Type", new string[] { "ControlSystem" }),
+                },
+                SendCommandToCodecHandler = SendCommandToCodec
+
+            };
+
         }
-        public void Initialize(string id)
+        public override void Initialize(string id)
         {
-            ModuleID = id;
+            base.Initialize(id);
             dispatcher.RegisterModule(this);
-            _codec = new SSH(User, Password, Host);
-            _codec.CodecResponseParseCallback = ResponseDataHandler;
+            _codec = new SSHHandler(User, Password, Host);
+            _codec.CodecResponseParseCallback = ParseCodecResponse;
+            _codec.CodecConnectionChanged += OnCodecConnectionChanged;
             _codec.Connect();
         }
 
@@ -80,62 +104,28 @@ namespace RoomKitModulePrototype
         {
             Debug.Log($"Command Module {ModuleID} - Codec Logged In!", DebugAlertLevel.Debug);
 
-            Tx(ReturnPeripheralConnectCommand());
+            PeripheralConnect.SetValue(new int[,] { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 } });
             _pollTimer.Enabled = true;
-            CodecConnectionStatusChanged();
+            BroadcastCodecStatus();
         }
         private void OnCodecHeartBeat(object source, ElapsedEventArgs e)
         {
             string macAddress = "01:02:03:03:05:06";
-
             var parameters = new Dictionary<string, string>()
             {
                 {"ID", macAddress },
             };
             var heartbeat = new XAPIStateCommand(XAPICommandType.XCommand, new string[] { "Peripherals" }, "HeartBeat", parameters);
-            //_codec.SendCommand(heartbeat);
-
-        }
-        private XAPIStateCommand ReturnPeripheralConnectCommand()
-        {
-            string hardwareInfo = "1";
-            string macAddress = "01:02:03:03:05:06";
-            string deviceName = "Crestron";
-            string deviceIP = "192.168.0.143";
-            string serial = "123456789";
-            string softwareInfo = ".NET 4.7.2 Console App";
-            string type = "ControlSystem";
-
-            //var cmdstring = $"xCommand Peripherals Connect HardwareInfo: {hardwareInfo} ID: {macAddress} Name: {deviceName} NetworkAddress: {deviceIP} SerialNumber: {serial} SoftwareInfo: {softwareInfo} Type: {type}";
-
-            var parameters = new Dictionary<string, string>()
-            {
-                { "HardwareInfo", hardwareInfo },
-                {"ID", macAddress },
-                {"Name", deviceName },
-                {"NetworkAddress", deviceIP },
-                {"SerialNumber", serial },
-                {"SoftwareInfo", softwareInfo },
-                {"Type", type }
-            };
-
-            return new XAPIStateCommand(XAPICommandType.XCommand, new string[] { "Peripherals" }, "Connect", parameters);
-
         }
         #endregion Poll&HeartBeat
-
         private void Tx(string cmd) { _codec.CommandQueue.Add(cmd); }
         private void Tx(XAPIBaseCommand cmd) { _codec.CommandQueue.Add(cmd.CommandString()); }
-        private void ResponseDataHandler(string responseData)
+        private void ParseCodecResponse(string responseData)
         {
-            //Thread.CurrentThread.DebugThreadID("ParseThread");
-
             Debug.Log("<<<<RAW Response Start>>>");
             Debug.Log(responseData);
-            Debug.Log("<<<<RAW Response End>>>\n");
+            Debug.Log("<<<<RAW Response End>>>");
 
-
-            codecConnected = true;
             if (!codecLoggedIn)
             {
                 ParseNonJson(responseData);
@@ -160,23 +150,26 @@ namespace RoomKitModulePrototype
                 }
             }
             _codec.CommandLock.Set();
-            var cmdnum = _codec.CommandQueue.Count;
-            Debug.Log(cmdnum.ToString());
 
         }
         private void ParseNonJson(string response)
         {
             //Debug.Log($"String Response: {response}");
 
-            if(response.Contains("Login successful"))
+            if (response.Contains("Login successful"))
+            {
+                Tx("Echo Off");
                 Tx("xPreferences outputmode json");
-
-            if (response.Contains("xPreferences outputmode json"))
                 codecLoggedIn = true;
+            }
+            //if (response.Contains("xPreferences outputmode json"))
+                
 
         }
-
-
+        protected override void SendCommandToCodec(XAPIBaseCommand command)
+        {
+            Tx(command);
+        }
 
         #region Events
         /// <summary>
@@ -188,8 +181,11 @@ namespace RoomKitModulePrototype
             if (args.Message is XAPIBaseCommand msg)
                 Tx(msg);
         }
-
-        private void CodecConnectionStatusChanged()
+        private void OnCodecConnectionChanged(object sender, CodecConnectionStatusEventArgs args)
+        {
+            codecConnected = args.CodecConnected;
+        }
+        private void BroadcastCodecStatus()
         {
             var status = new CodecCommStatusDTO();
 

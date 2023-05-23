@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Compile Remove="Common\DTO\XAPICommandDTO.cs" />
-    <Compile Remove="Modules\ButtonModule.cs" />
+    <Compile Remove="Common\Events\CodecCommunicationEventArgs.cs" />
     <Compile Remove="Modules\CoreModule.cs" />
     <Compile Remove="Modules\LogicModules\PropertyModule.cs" />
   </ItemGroup>

@@ -83,6 +83,22 @@ namespace RoomKitModulePrototype
                 return null;
             }
         }
+
+        public static IEnumerable<JToken> GetDescendantsAndSelf(this JToken token)
+        {
+            yield return token;
+
+            if (token is JContainer container)
+            {
+                foreach (var child in container.Children())
+                {
+                    foreach (var descendant in GetDescendantsAndSelf(child))
+                    {
+                        yield return descendant;
+                    }
+                }
+            }
+        }
     }
 }
 

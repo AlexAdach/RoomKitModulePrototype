@@ -46,13 +46,13 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public virtual void Initialize(string id)
+        public override void Initialize(string id)
         {
-            ModuleID = id;
+            base.Initialize(id);
             dispatcher.SetCommsSubscriptions(this);
         }
 
-        protected virtual void SendCommandToCodec(XAPIBaseCommand command)
+        protected override void SendCommandToCodec(XAPIBaseCommand command)
         {
             ToCommsModuleMessageSent?.Invoke(this, new InterModuleEventArgs(command));
         }
