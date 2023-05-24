@@ -44,7 +44,7 @@ namespace RoomKitModulePrototype
                 {
                     var comms = CodecCommsList.Where(x => x.ModuleID == module.ModuleID).First();
                     comms.CommandModuleMessageSent += module.FromCommandModuleMessageReceived;
-                    module.ToCommsModuleMessageSent += comms.LogicModuleMessageReceived;
+                    module.ToCommsModuleMessageSent += comms.FromLogicModules;
                     Debug.Log($"Dispatcher - Module: {module.ModuleType} successfully registered to Command Module: {comms.ModuleID}", DebugAlertLevel.Debug);
                 }
                 else

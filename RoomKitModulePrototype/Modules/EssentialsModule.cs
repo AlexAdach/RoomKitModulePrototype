@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace RoomKitModulePrototype
 {
@@ -37,7 +38,6 @@ namespace RoomKitModulePrototype
                 FeedbackStates = new string[] {"Standby", "Off", "Halfwake"},
                 SendCommandToCodecHandler = SendCommandToCodec
             });
-
             _states.Add(SpeakerTrackState = new CiscoState()
             {
                 Path = new string[] { "Cameras", "SpeakerTrack" },
@@ -47,7 +47,6 @@ namespace RoomKitModulePrototype
                 States = new string[] { "Activate", "Deactivate" },   
                 SendCommandToCodecHandler = SendCommandToCodec
             });
-
             _states.Add(CameraSelection = new CiscoValue()
             {
                 Path = new string[] { "Video", "Input" },
@@ -71,11 +70,10 @@ namespace RoomKitModulePrototype
                 state.GetState();
             }
         }
-
         public override void FromCommandModuleMessageReceived(object sender, InterModuleEventArgs args)
         {
+            Thread.CurrentThread.DebugThreadID("Essentials Module Msg Received!");
             base.FromCommandModuleMessageReceived(sender, args);
-
             if (args.Message is XAPIStatusResponse xapiStatus)
             {
                 foreach (var state in _states)

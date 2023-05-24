@@ -4,11 +4,13 @@ using System.Text;
 
 namespace RoomKitModulePrototype
 {
-    public enum XAPICommandType
+    public enum XAPICommandPrefix
     {
         XCommand,
         XConfiguration,
         XStatus,
-        XFeedbackRegister
+        XFeedbackRegister,
+        XPreferences,
+        Root,
     }
 }

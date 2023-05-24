@@ -6,8 +6,9 @@ namespace RoomKitModulePrototype
 {
     public class BaseControl
     {
+        public delegate void SendCommandToCodecDelegate(XAPIBaseCommand command);
         public string[] Path { get; set; }
-        public LogicModule.SendCommandToCodecDelegate SendCommandToCodecHandler { get; set; }
+        public SendCommandToCodecDelegate SendCommandToCodecHandler { get; set; }
         protected virtual void OnControlStateChanged() { } 
         
     }

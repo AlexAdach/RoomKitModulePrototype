@@ -6,13 +6,13 @@ namespace RoomKitModulePrototype
 {
     public class XAPIStateCommand : XAPIBaseCommand
     {
-        private XAPICommandType _type;
+        private XAPICommandPrefix _type;
         private string[] _path;
         private string _argument;
         private Dictionary<string, string> _parameters = new Dictionary<string, string>();
 
 
-        public XAPIStateCommand(XAPICommandType type, string[] path, string argument, Dictionary<string, string> parameters = null)
+        public XAPIStateCommand(XAPICommandPrefix type, string[] path, string argument, Dictionary<string, string> parameters = null)
         {
             _type = type;
             _path = path;
@@ -21,7 +21,7 @@ namespace RoomKitModulePrototype
         }
         public override string CommandString()
         {
-            if (_type != XAPICommandType.XFeedbackRegister)
+            if (_type != XAPICommandPrefix.XFeedbackRegister)
             {
                 //Concatenate path and separate with space. 
                 var path = string.Join(" ", _path);

@@ -11,10 +11,11 @@ namespace RoomKitModulePrototype
     {
         //public bool Initialized { get; }
         public event EventHandler<CodecConnectionStatusEventArgs> CodecConnectionChanged;
-        public CodecResponseParseHandler CodecResponseParseCallback { get; set; }
+        //public CodecResponseParseHandler CodecResponseParseCallback { get; set; }
         public AutoResetEvent CommandLock { get; }
         public BlockingCollection<string> CommandQueue { get; }
-        public void Connect();
+        public bool Connect { get; set; }
+        //public void Connect();
 
         //public void SendString(string cmd);
         //public void SendCommand(XAPIBaseCommand cmd);

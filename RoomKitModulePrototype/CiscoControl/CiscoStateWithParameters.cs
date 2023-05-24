@@ -42,7 +42,7 @@ namespace RoomKitModulePrototype
                     }
                 }
 
-                var cmd = new XAPIValueCommand(XAPICommandType.XCommand, Path, States[state], parameterString.ToArray());
+                var cmd = new XAPIValueCommand(XAPICommandPrefix.XCommand, Path, States[state], parameterString.ToArray());
                 SendCommandToCodecHandler.Invoke(cmd);
             }
         }

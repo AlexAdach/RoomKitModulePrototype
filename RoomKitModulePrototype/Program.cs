@@ -21,6 +21,7 @@ namespace RoomKitModulePrototype
 
             EssentialsModule essentialsModule = new EssentialsModule();
             essentialsModule.Initialize("Module1");
+            
 
             while (true)
             {
@@ -46,13 +47,8 @@ namespace RoomKitModulePrototype
         public static void Module1()
         {
             CommandModule commandModule1 = new CommandModule();
-            commandModule1.User = "Tritech";
-            commandModule1.Password = "20!9GolfR";
-            commandModule1.Host = "192.168.0.113";
-
-
             commandModule1.Initialize("Module1");
-
+            //commandModule1.Codec.InitializeSSH("Tritech", "20!9GolfR", "192.168.0.113");
 
     }
 

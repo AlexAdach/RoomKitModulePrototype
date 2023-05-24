@@ -8,44 +8,6 @@ namespace RoomKitModulePrototype
     {
         public event EventHandler<InterModuleEventArgs> ToCommsModuleMessageSent = delegate { };
 
-        public delegate void SendCommandToCodecDelegate(XAPIBaseCommand command);
-
-        protected bool _codecConnected;
-        protected bool _codecLoggedIn;
-
-        private bool codecConnected
-        {
-            get
-            { return _codecConnected; }
-            set
-            {
-                if (_codecConnected != value)
-                {
-                    _codecConnected = value;
-                    if (value == false)
-                    {
-                        ModulePropertiesReset();
-                    }
-                }
-            }
-        }
-        private bool codecLoggedIn
-        {
-            get
-            { return _codecLoggedIn; }
-            set
-            {
-                if (_codecLoggedIn != value)
-                {
-                    _codecLoggedIn = value;
-                    if (value == true)
-                    {
-                        ModulePropertiesBoot();
-                    }
-                }
-            }
-        }
-
         public override void Initialize(string id)
         {
             base.Initialize(id);
@@ -69,13 +31,12 @@ namespace RoomKitModulePrototype
 
         public virtual void FromCommandModuleMessageReceived(object sender, InterModuleEventArgs args)
         {
-            Debug.Log($"Logic Module received message from Command Module.", DebugAlertLevel.DebugCode);
-
-            if(args.Message is CodecCommStatusDTO codecStatus)
+            //Debug.Log($"{ModuleType} Message Received! {args.Message.GetType()}");
+            if(args.Message is CodecCommunicationStatusDTO status)
             {
-                //Debug.Log($"Codec Status {codecStatus.CodecConnected} {codecStatus.CodecLoggedIn}");
-                codecConnected = codecStatus.CodecConnected;
-                codecLoggedIn = codecStatus.CodecLoggedIn;
+                Debug.Log($"{status.ConnectionConfigured}");
+                if (status.ConnectionConfigured)
+                    ModulePropertiesBoot();
             }
         }
 
