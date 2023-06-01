@@ -1,16 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
+﻿using System;
+
 
 namespace RoomKitModulePrototype
-{
-    
+{ 
     public class CommandModule : BaseModule
     {
         public event EventHandler<InterModuleEventArgs> CommandModuleMessageSent = delegate { };
@@ -26,7 +18,7 @@ namespace RoomKitModulePrototype
         {
             base.Initialize(id);
             dispatcher.RegisterModule(this);
-            Codec.InitializeSSH("Tritech", "20!9GolfR", "192.168.0.113");
+            Codec.InitializeSSH("Tritech", "20!9GolfR", "192.168.0.130");
         }
         protected override void SendCommandToCodec(XAPIBaseCommand command)
         {
@@ -44,14 +36,11 @@ namespace RoomKitModulePrototype
         }
         private void OnCommunicationManagerMessageReceived(BaseDTO msg)
         {
-            
             if (msg is CodecCommunicationStatusDTO status)
             {
                 OnCodecStatusChanged(status);
             }
             ToLogicModules(msg);
-
-            
         }
         private void OnCodecStatusChanged(CodecCommunicationStatusDTO status)
         {

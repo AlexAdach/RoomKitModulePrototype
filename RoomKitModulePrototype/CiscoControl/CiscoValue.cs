@@ -30,17 +30,17 @@ namespace RoomKitModulePrototype
                         }
                         else
                         {
-                            Debug.Log("Set Value Argument Error. Value for ID is outside array bounds.", DebugAlertLevel.Error);
+                            Debug.Log("Set Value Argument Error. Value for ID is outside array bounds.", DebugAlertLevelEnum.Error);
                         }
                     }
                 }
                 else
                 {
-                    Debug.Log("Set Value Argument Error. ID index is outside declared bounds", DebugAlertLevel.Error);
+                    Debug.Log("Set Value Argument Error. ID index is outside declared bounds", DebugAlertLevelEnum.Error);
                 }
             }
 
-            var cmd = new XAPIValueCommand(XAPICommandPrefix.XCommand, Path, SetValueArgument, parameterString.ToArray());
+            var cmd = new XAPIValueCommand(XAPICommandPrefixEnum.XCommand, Path, SetValueArgument, parameterString.ToArray());
             SendCommandToCodecHandler.Invoke(cmd);
         }
 

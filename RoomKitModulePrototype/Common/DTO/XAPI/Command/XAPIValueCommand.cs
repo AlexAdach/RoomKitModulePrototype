@@ -6,12 +6,12 @@ namespace RoomKitModulePrototype
 {
     public class XAPIValueCommand : XAPIBaseCommand
     {
-        private XAPICommandPrefix _type;
+        private XAPICommandPrefixEnum _type;
         private string[] _path;
         private string _argument;
         string[] _parameters;
 
-        public XAPIValueCommand(XAPICommandPrefix type, string[] path, string argument, string[] parameters = null)
+        public XAPIValueCommand(XAPICommandPrefixEnum type, string[] path, string argument, string[] parameters = null)
         {
             _type = type;
             _path = path;

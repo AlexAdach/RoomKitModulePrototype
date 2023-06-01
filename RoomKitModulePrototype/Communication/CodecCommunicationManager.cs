@@ -62,11 +62,7 @@ namespace RoomKitModulePrototype
         }
         private void ParseCodecResponse(string responseData)
         {
-
-
             Debug.Log($"<<<<RAW Response Start>>>\n{responseData}<<<<RAW Response End>>>\n");
-
-
             var separatedJsons = responseData.SeparateJSON();
             foreach (var json in separatedJsons)
             {
@@ -108,7 +104,11 @@ namespace RoomKitModulePrototype
         }
         private void OnSSHConnectionStatusChanged(object sender, CodecConnectionStatusEventArgs args)
         {
+            if (CodecConnected == true && args.CodecConnected == false && _ssh.Connect == true)
+                _ssh.ConnectSSH();
+
             CodecConnected = args.CodecConnected;
+
             //Debug.Log($"SSH Connection Status: {args.CodecConnectionStatus}");
         }
     }

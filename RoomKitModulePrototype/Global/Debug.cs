@@ -17,9 +17,9 @@ namespace RoomKitModulePrototype
             PrintToConsole(s);
         }
 
-        public static void Log(string s, DebugAlertLevel level)
+        public static void Log(string s, DebugAlertLevelEnum level)
         {
-            DebugAlertLevel alertLevel = DebugAlertLevel.Error | DebugAlertLevel.Debug | DebugAlertLevel.DebugComms;
+            DebugAlertLevelEnum alertLevel = DebugAlertLevelEnum.Error | DebugAlertLevelEnum.Debug | DebugAlertLevelEnum.DebugComms;
 
             if(FlagsHelper.IsSet(alertLevel, level))
             PrintToConsole(s);

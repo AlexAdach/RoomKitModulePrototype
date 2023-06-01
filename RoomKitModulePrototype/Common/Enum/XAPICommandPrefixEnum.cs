@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RoomKitModulePrototype
 {
-    public enum XAPICommandPrefix
+    public enum XAPICommandPrefixEnum
     {
         XCommand,
         XConfiguration,

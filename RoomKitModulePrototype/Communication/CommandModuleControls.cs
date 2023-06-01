@@ -32,14 +32,14 @@ namespace RoomKitModulePrototype
                 SendCommandToCodecHandler = callback
             };
 
-            EchoMode = new CiscoSet(XAPICommandPrefix.Root)
+            EchoMode = new CiscoSet(XAPICommandPrefixEnum.Root)
             {
                 Path = new string[] { "Echo" },
                 States = new string[] {"On", "Off"},
                 SendCommandToCodecHandler = callback
             };
 
-            OutputMode = new CiscoSet(XAPICommandPrefix.XPreferences)
+            OutputMode = new CiscoSet(XAPICommandPrefixEnum.XPreferences)
             {
                 Path = new string[] { "outputmode" },
                 States = new string[] { "json" },

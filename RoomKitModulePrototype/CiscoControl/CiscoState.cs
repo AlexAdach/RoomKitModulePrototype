@@ -11,7 +11,7 @@ namespace RoomKitModulePrototype
         {
             if (States[state] != null)
             {
-                var cmd = new XAPIStateCommand(XAPICommandPrefix.XCommand, Path, States[state]);
+                var cmd = new XAPIStateCommand(XAPICommandPrefixEnum.XCommand, Path, States[state]);
                 SendCommandToCodecHandler.Invoke(cmd);
             }
         }

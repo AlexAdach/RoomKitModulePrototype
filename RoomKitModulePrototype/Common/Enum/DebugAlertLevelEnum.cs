@@ -5,7 +5,7 @@ using System.Text;
 namespace RoomKitModulePrototype
 {
     [Flags]
-    public enum DebugAlertLevel
+    public enum DebugAlertLevelEnum
     {
         None = 0,
         Error = 1,

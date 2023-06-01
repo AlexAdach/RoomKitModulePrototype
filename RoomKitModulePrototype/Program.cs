@@ -26,18 +26,9 @@ namespace RoomKitModulePrototype
             while (true)
             {
                 Console.ReadLine();
-                essentialsModule.CameraSelection.SetValue(new int[,] {{ 0, 0 }});
+                essentialsModule.StandbyState.StandbyOn();
                 Console.ReadLine();
-                essentialsModule.CameraSelection.SetValue(new int[,] { { 0, 1 } });
-                Console.ReadLine();
-                essentialsModule.StandbyState.SetState(1);
-                Console.ReadLine();
-               
-                essentialsModule.PrivacyMuteState.SetState(1);
-                //Console.ReadLine();
-
-                Console.WriteLine($"Standby - {essentialsModule.StandbyState.CurrentStatusIndex} - {essentialsModule.StandbyState.CurrentStatusString}");
-                Console.WriteLine($"Microphones - {essentialsModule.PrivacyMuteState.CurrentStatusIndex} - {essentialsModule.PrivacyMuteState.CurrentStatusString}");
+                essentialsModule.StandbyState.StandbyOff();
 
             }
 

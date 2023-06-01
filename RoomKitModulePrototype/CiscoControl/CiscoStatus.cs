@@ -22,12 +22,12 @@ namespace RoomKitModulePrototype
         public NotifySimplPlusDelegate NotifySimplPlusHandler { get; set; }
         void ICiscoStatus.GetState()
         {
-            var cmd = new XAPIStateCommand(XAPICommandPrefix.XStatus, Path, StatusArgument);
+            var cmd = new XAPIStateCommand(XAPICommandPrefixEnum.XStatus, Path, StatusArgument);
             SendCommandToCodecHandler.Invoke(cmd);
         }
         void ICiscoStatus.RegisterFeedback()
         {
-            var cmd = new XAPIStateCommand(XAPICommandPrefix.XFeedbackRegister, Path, StatusArgument);
+            var cmd = new XAPIStateCommand(XAPICommandPrefixEnum.XFeedbackRegister, Path, StatusArgument);
             SendCommandToCodecHandler.Invoke(cmd);
         }
         void ICiscoStatus.CheckStatusResponse(XAPIStatusResponse xapiStatus)

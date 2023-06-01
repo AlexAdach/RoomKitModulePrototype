@@ -7,38 +7,33 @@ namespace RoomKitModulePrototype
 {
     public class EssentialsModule : LogicModule
     {
-        private readonly List<ICiscoStatus> _states;
+        private readonly List<IState> _states;
 
-        public CiscoState PrivacyMuteState;
-        public CiscoState StandbyState;
+        public AudioMicrophonesMute AudioMicrophonesMute;
+        public StandbyState StandbyState;
+        public SpeakerTrack SpeakerTrack;
+
         public CiscoState SpeakerTrackState;
 
-        public CiscoValue CameraSelection;
+        //public CiscoValue CameraSelection;
 
         public EssentialsModule() 
         {
-            ModuleType = "Essentials Module";
-            _states = new List<ICiscoStatus>();
+            AudioMicrophonesMute = new AudioMicrophonesMute(SendCommandToCodec);
+            StandbyState = new StandbyState(SendCommandToCodec);
+            SpeakerTrack = new SpeakerTrack(SendCommandToCodec);
 
-            _states.Add(PrivacyMuteState = new CiscoState()
-            {
-                Path = new string[] { "Audio", "Microphones" },
-                States = new string[] { "Mute", "Unmute" },
-                ShouldRegisterFeedback = true,
-                StatusArgument = "Mute",
-                FeedbackStates = new string[] { "On", "Off" },
-                SendCommandToCodecHandler = SendCommandToCodec                
-            });
-            _states.Add(StandbyState = new CiscoState()
-            {
-                Path = new string[] {"Standby"},
-                States = new string[] {"Activate", "Deactivate", "Halfwake"},
-                ShouldRegisterFeedback = true,
-                StatusArgument = "State",
-                FeedbackStates = new string[] {"Standby", "Off", "Halfwake"},
-                SendCommandToCodecHandler = SendCommandToCodec
-            });
-            _states.Add(SpeakerTrackState = new CiscoState()
+            _states = new List<IState>{
+                AudioMicrophonesMute,
+                StandbyState,
+                SpeakerTrack
+            };
+
+
+            ModuleType = "Essentials Module";
+
+
+/*            _states.Add(SpeakerTrackState = new CiscoState()
             {
                 Path = new string[] { "Cameras", "SpeakerTrack" },
                 StatusArgument = "Status",
@@ -59,15 +54,15 @@ namespace RoomKitModulePrototype
                     new CiscoParameter("ConnectorId", new string[] { "1", "2", "3", "4", "5", "6" })
                 },
                 SendCommandToCodecHandler = SendCommandToCodec
-            });
+            });*/
         }
         protected override void ModulePropertiesBoot()
         {
             base.ModulePropertiesBoot();
             foreach(var state in _states)
             {
+                if(state.IsRegisterFeedback)
                 state.RegisterFeedback();
-                state.GetState();
             }
         }
         public override void FromCommandModuleMessageReceived(object sender, InterModuleEventArgs args)
@@ -81,9 +76,6 @@ namespace RoomKitModulePrototype
                     state.CheckStatusResponse(xapiStatus);
                 }
             }
-
         }
-
-
     }
 }

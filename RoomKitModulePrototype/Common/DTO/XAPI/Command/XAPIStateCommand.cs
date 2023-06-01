@@ -6,13 +6,15 @@ namespace RoomKitModulePrototype
 {
     public class XAPIStateCommand : XAPIBaseCommand
     {
-        private XAPICommandPrefix _type;
+        private XAPICommandPrefixEnum _type;
         private string[] _path;
         private string _argument;
         private Dictionary<string, string> _parameters = new Dictionary<string, string>();
+        
+        //public XAPICommandPrefix Type { get { return _type; } }
 
 
-        public XAPIStateCommand(XAPICommandPrefix type, string[] path, string argument, Dictionary<string, string> parameters = null)
+        public XAPIStateCommand(XAPICommandPrefixEnum type, string[] path, string argument, Dictionary<string, string> parameters = null)
         {
             _type = type;
             _path = path;
@@ -21,7 +23,7 @@ namespace RoomKitModulePrototype
         }
         public override string CommandString()
         {
-            if (_type != XAPICommandPrefix.XFeedbackRegister)
+            if (_type != XAPICommandPrefixEnum.XFeedbackRegister)
             {
                 //Concatenate path and separate with space. 
                 var path = string.Join(" ", _path);
@@ -51,6 +53,26 @@ namespace RoomKitModulePrototype
                 var cmd = prefix + " " + pathslash + "/" + _argument;
                 return cmd;
             }
+        }
+
+        public string GetExpectedResponse()
+        {
+            switch (_type)
+            {
+                case XAPICommandPrefixEnum.XCommand:
+                    return "xCommand";
+                case XAPICommandPrefixEnum.XConfiguration:
+                    return "xConfiguration";
+                case XAPICommandPrefixEnum.XFeedbackRegister:
+                    return "xFeedback register";
+                case XAPICommandPrefixEnum.XStatus:
+                    return "xStatus";
+                case XAPICommandPrefixEnum.XPreferences:
+                    return "xPreferences";
+                default:
+                    return "";
+            }
+
         }
     }
 }

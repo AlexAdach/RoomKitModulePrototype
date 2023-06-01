@@ -20,13 +20,13 @@ namespace RoomKitModulePrototype
                 if(!CodecCommsList.Contains(module))
                 {
                     CodecCommsList.AddFirst(module);
-                    Debug.Log($"Dispatcher - New Command Module Registered ID = {module.ModuleID}", DebugAlertLevel.Debug);
+                    Debug.Log($"Dispatcher - New Command Module Registered ID = {module.ModuleID}", DebugAlertLevelEnum.Debug);
                     NewCommandModuleRegistered(new ModuleRegistrationEventArgs<CommandModule>(module));
                     
                 }
                 else
                 {
-                    Debug.Log($"Dispatcher - A Comms Module already exists with and ID of {module.ModuleID}", DebugAlertLevel.Error);
+                    Debug.Log($"Dispatcher - A Comms Module already exists with and ID of {module.ModuleID}", DebugAlertLevelEnum.Error);
                 }
             }
             finally
@@ -45,7 +45,7 @@ namespace RoomKitModulePrototype
                     var comms = CodecCommsList.Where(x => x.ModuleID == module.ModuleID).First();
                     comms.CommandModuleMessageSent += module.FromCommandModuleMessageReceived;
                     module.ToCommsModuleMessageSent += comms.FromLogicModules;
-                    Debug.Log($"Dispatcher - Module: {module.ModuleType} successfully registered to Command Module: {comms.ModuleID}", DebugAlertLevel.Debug);
+                    Debug.Log($"Dispatcher - Module: {module.ModuleType} successfully registered to Command Module: {comms.ModuleID}", DebugAlertLevelEnum.Debug);
                 }
                 else
                 {
@@ -54,7 +54,7 @@ namespace RoomKitModulePrototype
             }
             catch (Exception e)
             {
-                Debug.Log($"Error setting event subscriptions - {e.Message}", DebugAlertLevel.Error);
+                Debug.Log($"Error setting event subscriptions - {e.Message}", DebugAlertLevelEnum.Error);
             }
             finally
             {

@@ -21,12 +21,12 @@ namespace RoomKitModulePrototype
 
         protected virtual void ModulePropertiesReset() 
         {
-            Debug.Log($"{ModuleType} resetting properties.", DebugAlertLevel.DebugCode);
+            Debug.Log($"{ModuleType} resetting properties.", DebugAlertLevelEnum.DebugCode);
         }
 
         protected virtual void ModulePropertiesBoot() 
         {
-            Debug.Log($"{ModuleType} properties boot.", DebugAlertLevel.DebugCode);
+            Debug.Log($"{ModuleType} properties boot.", DebugAlertLevelEnum.DebugCode);
         }
 
         public virtual void FromCommandModuleMessageReceived(object sender, InterModuleEventArgs args)

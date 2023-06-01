@@ -40,19 +40,19 @@ namespace RoomKitModulePrototype
             }
         }
 
-        public static string CommandTypeToString(XAPICommandPrefix type)
+        public static string CommandTypeToString(XAPICommandPrefixEnum type)
         {
             switch (type)
             {
-                case XAPICommandPrefix.XCommand:
+                case XAPICommandPrefixEnum.XCommand:
                     return "xCommand";
-                case XAPICommandPrefix.XConfiguration:
+                case XAPICommandPrefixEnum.XConfiguration:
                     return "xConfiguration";
-                case XAPICommandPrefix.XFeedbackRegister:
+                case XAPICommandPrefixEnum.XFeedbackRegister:
                     return "xFeedback register";
-                case XAPICommandPrefix.XStatus:
+                case XAPICommandPrefixEnum.XStatus:
                     return "xStatus";
-                case XAPICommandPrefix.XPreferences:
+                case XAPICommandPrefixEnum.XPreferences:
                     return "xPreferences";
                 default:
                     return "";

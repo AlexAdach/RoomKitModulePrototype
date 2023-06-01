@@ -18,6 +18,7 @@ namespace RoomKitModulePrototype
         private bool _connect;
         private int _connectionAttemps;
 
+        public bool Connect { get { return _connect; } }
 
         private CodecCommunicationManager.CodecResponseParseHandler CodecResponseParseCallback;
         public SSHClientWrapper(string user, string password, string host, CodecCommunicationManager.CodecResponseParseHandler responseCallback) : base()
@@ -47,7 +48,6 @@ namespace RoomKitModulePrototype
         {
             try
             {
-
                 stream.WriteLine(command.CommandString());
                 /*                var state = new object();
                                 var expectTask = stream.BeginExpect(TimeSpan.FromMilliseconds(100), null, state, new ExpectAction(command.CommandString(), output => {

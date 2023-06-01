@@ -6,8 +6,8 @@ namespace RoomKitModulePrototype
 {
     public class CiscoSet : BaseControl
     {
-        private XAPICommandPrefix _prefix;
-        public CiscoSet(XAPICommandPrefix prefix = XAPICommandPrefix.XCommand)
+        private XAPICommandPrefixEnum _prefix;
+        public CiscoSet(XAPICommandPrefixEnum prefix = XAPICommandPrefixEnum.XCommand)
         {
             _prefix = prefix;
         }
